@@ -90,22 +90,46 @@ document.addEventListener("click", async (e) => {
 // AUTH STATE HANDLER (FIREBASE)
 // ========================================
 onAuthStateChanged(auth, (user) => {
+  const navUserArea = document.getElementById("navUserArea");
+  const mobileUserArea = document.getElementById("mobileUserArea");
+
   if (user) {
-    // User is signed in
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("userDisplayName", user.displayName || "User");
     updateUIForLogin();
   } else {
-    // User is signed out
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userDisplayName");
-    // Also clear any UI specific to logged in state
-    const navUserArea = document.getElementById("navUserArea");
-    const mobileUserArea = document.getElementById("mobileUserArea");
-    if (navUserArea) navUserArea.innerHTML = '';
-    if (mobileUserArea) mobileUserArea.innerHTML = '';
+
+    // 🔥 RESTORE LOGIN BUTTON (DESKTOP)
+    if (navUserArea) {
+      navUserArea.innerHTML = `
+        <button class="btn-login" id="loginBtn">Login</button>
+      `;
+
+      // reattach modal click
+      document
+        .getElementById("loginBtn")
+        ?.addEventListener("click", () => {
+          document.getElementById("loginModal")?.classList.remove("hidden");
+        });
+    }
+
+    // 🔥 RESTORE LOGIN BUTTON (MOBILE)
+    if (mobileUserArea) {
+      mobileUserArea.innerHTML = `
+        <button class="btn-login" id="mobileLoginBtn">Login</button>
+      `;
+
+      document
+        .getElementById("mobileLoginBtn")
+        ?.addEventListener("click", () => {
+          document.getElementById("loginModal")?.classList.remove("hidden");
+        });
+    }
   }
 });
+
 
 // ========================================
 // LOGOUT
