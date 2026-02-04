@@ -3,6 +3,23 @@
 // ========================================
 
 // Storage for URL mappings with metadata
+console.log("JS file loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("googleLoginBtn");
+
+  if (!btn) {
+    console.error("❌ Google login button NOT found");
+    return;
+  }
+
+  console.log("✅ Google login button found");
+
+  btn.addEventListener("click", () => {
+    console.log("🔥 Google button clicked");
+  });
+});
+
 const urlDatabase = new Map();
 const linksHistory = [];
 
