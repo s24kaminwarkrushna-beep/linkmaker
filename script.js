@@ -607,7 +607,6 @@ function loadFromLocalStorage() {
 
 /**
  * Simulates link redirection
- * In a real application, this would happen on a server
  * @param {string} shortCode - The short code to redirect
  */
 function handleRedirect(shortCode) {
@@ -622,10 +621,8 @@ function handleRedirect(shortCode) {
             updateDashboard();
         }
 
-        console.log(`Redirecting to: ${originalURL}`);
-        if (confirm(`This would redirect you to:\n${originalURL}\n\nClick OK to open in new tab.`)) {
-            window.open(originalURL, '_blank');
-        }
+        // Direct redirection
+        window.location.href = originalURL;
     } else {
         alert('Short link not found!');
     }
@@ -642,8 +639,6 @@ function checkForRedirect() {
         const shortCode = hash.substring(2);
         if (urlDatabase.has(shortCode)) {
             handleRedirect(shortCode);
-            // Clear hash after redirect to clean up URL
-            window.location.hash = '';
             return;
         }
     }
