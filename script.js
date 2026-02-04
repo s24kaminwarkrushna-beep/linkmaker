@@ -1,35 +1,143 @@
 // ========================================
-// LINKMAKER - URL SHORTENER APPLICATION
+// FIREBASE SETUP
 // ========================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Storage for URL mappings with metadata
-console.log("JS file loaded");
+// 🔴 REPLACE WITH YOUR OWN FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("googleLoginBtn");
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-  if (!btn) {
-    console.error("❌ Google login button NOT found");
-    return;
-  }
-
-  console.log("✅ Google login button found");
-
-  document.addEventListener("click", (e) => {
-  const googleBtn = e.target.closest("#googleLoginBtn");
-
-  if (!googleBtn) return;
-
-  console.log("🔥 Google button clicked — redirecting");
-  signInWithRedirect(auth, provider);
+provider.setCustomParameters({
+  prompt: "select_account"
 });
 
-});
+console.log("🔥 Firebase connected successfully");
 
+// ========================================
+// GLOBAL DATA
+// ========================================
 const urlDatabase = new Map();
 const linksHistory = [];
 
-// DOM Elements
+// ========================================
+// GOOGLE LOGIN
+// ========================================
+document.addEventListener("click", async (e) => {
+  const googleBtn = e.target.closest("#googleLoginBtn");
+  if (!googleBtn) return;
+
+  try {
+    console.log("🔥 Google login clicked");
+
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    console.log("✅ Logged in:", user.email);
+
+    // Save to localStorage for persistence across page reloads
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userDisplayName", user.displayName || "User");
+
+    // Close modal if open
+    const loginModal = document.getElementById("loginModal");
+    if (loginModal) loginModal.classList.add("hidden");
+    
+    // Refresh UI
+    updateUIForLogin();
+    
+    // Optional: Reload page to ensure everything syncs
+    // window.location.reload();
+  } catch (err) {
+    console.error("❌ Login failed", err);
+    alert("Google login failed. Please check your console for details.");
+  }
+});
+
+// ========================================
+// AUTH STATE HANDLER (FIREBASE)
+// ========================================
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userDisplayName", user.displayName || "User");
+    updateUIForLogin();
+  } else {
+    // User is signed out
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userDisplayName");
+    // Also clear any UI specific to logged in state
+    const navUserArea = document.getElementById("navUserArea");
+    const mobileUserArea = document.getElementById("mobileUserArea");
+    if (navUserArea) navUserArea.innerHTML = '';
+    if (mobileUserArea) mobileUserArea.innerHTML = '';
+  }
+});
+
+// ========================================
+// LOGOUT
+// ========================================
+window.logoutUser = async () => {
+  try {
+    await signOut(auth);
+    localStorage.clear();
+    window.location.reload();
+  } catch (err) {
+    console.error("Logout failed", err);
+  }
+};
+
+// ========================================
+// UI LOGIN STATE
+// ========================================
+function updateUIForLogin() {
+  const navUserArea = document.getElementById("navUserArea");
+  const mobileUserArea = document.getElementById("mobileUserArea");
+
+  const name = localStorage.getItem("userDisplayName") || "User";
+  const initial = name.charAt(0).toUpperCase();
+  const displayNavName = name.length > 12 ? name.substring(0, 10) + '...' : name;
+
+  if (navUserArea) {
+    navUserArea.innerHTML = `
+      <div class="user-profile-nav" onclick="window.location.href='profile.html'">
+        <div class="user-avatar">${initial}</div>
+        <span class="user-name">${displayNavName}</span>
+      </div>
+    `;
+  }
+
+  if (mobileUserArea) {
+    mobileUserArea.innerHTML = `
+      <div class="mobile-user-profile">
+        <div class="user-avatar">${initial}</div>
+        <div style="display: flex; flex-direction: column;">
+          <span class="user-name" onclick="window.location.href='profile.html'">${name}</span>
+          <a href="#" onclick="logoutUser()" style="margin-left: 0; margin-top: 4px;">Logout</a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ========================================
+// DOM ELEMENTS
+// ========================================
 const urlInput = document.getElementById('urlInput');
 const shortenBtn = document.getElementById('shortenBtn');
 const btnText = document.querySelector('.btn-text');
@@ -51,7 +159,6 @@ const totalLinksEl = document.getElementById('totalLinks');
 const totalClicksEl = document.getElementById('totalClicks');
 const activeLinksEl = document.getElementById('activeLinks');
 const linkChangeEl = document.getElementById('linkChange');
-// refreshBtn removed
 
 // Dashboard Data
 let dashboardData = {
@@ -228,8 +335,6 @@ function animateCounter(element, start, end) {
         element.textContent = Math.floor(current).toLocaleString();
     }, 16);
 }
-
-
 
 /**
  * Save dashboard data to localStorage
@@ -747,8 +852,6 @@ if (ctaShortenBtn) {
     });
 }
 
-// Refresh functionality removed
-
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
     if (mobileMenu.classList.contains('active') && 
@@ -862,119 +965,15 @@ function initCookieConsent() {
     });
 }
 
-
-
-// Login Logic
-function initLogin() {
-    const loginModal = document.getElementById('loginModal');
-    const loginBtn = document.getElementById('loginBtn');
-    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
-    const closeModal = document.getElementById('closeModal');
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const navUserArea = document.getElementById('navUserArea');
-    const mobileUserArea = document.getElementById('mobileUserArea');
-
-    function updateUIForLogin() {
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isLoggedIn) {
-            let userName = localStorage.getItem('userDisplayName') || 'Krushna Anil Kaminwar';
-            // Shorten name for nav if too long
-            const displayNavName = userName.length > 12 ? userName.substring(0, 10) + '...' : userName;
-            const userInitial = userName.charAt(0).toUpperCase();
-
-            if (navUserArea) {
-                navUserArea.innerHTML = `
-                    <div class="user-profile-nav" onclick="window.location.href='profile.html'">
-                        <div class="user-avatar">${userInitial}</div>
-                        <span class="user-name">${displayNavName}</span>
-                    </div>
-                `;
-            }
-            if (mobileUserArea) {
-                mobileUserArea.innerHTML = `
-                    <div class="mobile-user-profile">
-                        <div class="user-avatar">${userInitial}</div>
-                        <div style="display: flex; flex-direction: column;">
-                            <span class="user-name" onclick="window.location.href='profile.html'">${userName}</span>
-                            <a href="#" class="logout-link" id="logoutBtn" style="margin-left: 0; margin-top: 4px;">Logout</a>
-                        </div>
-                    </div>
-                `;
-                const logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        localStorage.removeItem('isLoggedIn');
-                        window.location.reload();
-                    });
-                }
-            }
-        }
-    }
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-        });
-    }
-
-    if (mobileLoginBtn) {
-        mobileLoginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            loginModal.classList.add('hidden');
-        });
-    }
-
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            localStorage.setItem('isLoggedIn', 'true');
-            // When logging in, also accept cookies automatically
-            localStorage.setItem('cookieChoice', 'accepted');
-            const cookieBanner = document.getElementById('cookieConsent');
-            if (cookieBanner) cookieBanner.classList.add('hidden');
-            
-            loginModal.classList.add('hidden');
-            updateUIForLogin();
-            window.location.reload(); // Refresh to sync UI across components
-        });
-    }
-
-    if (!localStorage.getItem('isLoggedIn')) {
-        setTimeout(() => {
-            if (!localStorage.getItem('isLoggedIn') && loginModal) {
-                loginModal.classList.remove('hidden');
-            }
-        }, 1500);
-    }
-
-    updateUIForLogin();
-    
-    // Check if on about page and update user info
-    if (window.location.pathname.includes('about.html')) {
-        const userInfoDisplay = document.getElementById('userInfoDisplay');
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isLoggedIn && userInfoDisplay) {
-            userInfoDisplay.classList.remove('hidden');
-        }
-    }
-}
-
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         init();
         initCookieConsent();
-        initLogin();
     });
 } else {
     init();
     initCookieConsent();
-    initLogin();
 }
 
 // ========================================
