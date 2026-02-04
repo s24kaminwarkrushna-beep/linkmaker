@@ -162,8 +162,8 @@ function showResult(shortCode, originalURL) {
     shortLinkDisplay.textContent = shortURL;
     originalUrlText.textContent = originalURL;
     
-    // Generate QR code for the shortened link
-    generateQRCode(fullShortURL);
+    // Generate QR code for the ORIGINAL long URL
+    generateQRCode(originalURL);
     
     // Show result card with animation
     resultCard.classList.remove('hidden');
@@ -545,10 +545,9 @@ async function handleCopyLink() {
 function generateQRCode(text) {
     const qrContainer = document.getElementById('qrCode');
     
-    // Use a free QR code API to generate the QR code
+    // Uses the original long URL for the QR code for instant cross-device scannability
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}&margin=10`;
     
-    // Create an image element
     qrContainer.innerHTML = `
         <img src="${qrApiUrl}" alt="QR Code" style="width: 100%; height: 100%; border-radius: 8px;" />
     `;
@@ -558,15 +557,16 @@ function generateQRCode(text) {
  * Handles QR code button click - downloads the QR code
  */
 function handleQRClick() {
-    const shortURL = 'https://' + shortLinkDisplay.textContent;
+    // Get the original URL from the display element
+    const originalURL = originalUrlText.textContent;
     
-    // Create download link for QR code
-    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(shortURL)}&margin=10`;
+    // Use the original long URL for the download too
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
     
     // Create a temporary link and trigger download
     const link = document.createElement('a');
     link.href = qrApiUrl;
-    link.download = `qr-code-${shortLinkDisplay.textContent.split('/')[1]}.png`;
+    link.download = `qr-code-original.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
