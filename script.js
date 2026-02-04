@@ -15,9 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ Google login button found");
 
-  btn.addEventListener("click", () => {
-    console.log("🔥 Google button clicked");
-  });
+  document.addEventListener("click", (e) => {
+  const googleBtn = e.target.closest("#googleLoginBtn");
+
+  if (!googleBtn) return;
+
+  console.log("🔥 Google button clicked — redirecting");
+  signInWithRedirect(auth, provider);
+});
+
 });
 
 const urlDatabase = new Map();
