@@ -12,10 +12,10 @@ import {
 
 // 🔴 REPLACE WITH YOUR OWN FIREBASE CONFIG
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB9hswCz4qUriPm5WR7_W2Y4N0g7D-pReI",
+  authDomain: "linkmaker-735e9.firebaseapp.com",
+  projectId: "linkmaker-735e9",
+  appId: "1:247697787542:web:9e7a352fcff462cd0b10b7"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -27,7 +27,25 @@ provider.setCustomParameters({
 });
 
 console.log("🔥 Firebase connected successfully");
+// ========================================
+// LOGIN MODAL HANDLING  ✅ PASTE HERE
+// ========================================
+const loginBtn = document.getElementById("loginBtn");
+const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+const loginModal = document.getElementById("loginModal");
+const closeModal = document.getElementById("closeModal");
 
+loginBtn?.addEventListener("click", () => {
+  loginModal.classList.remove("hidden");
+});
+
+mobileLoginBtn?.addEventListener("click", () => {
+  loginModal.classList.remove("hidden");
+});
+
+closeModal?.addEventListener("click", () => {
+  loginModal.classList.add("hidden");
+});
 // ========================================
 // GLOBAL DATA
 // ========================================
