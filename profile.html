@@ -3,130 +3,430 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - LinkMaker</title>
+    <meta name="description" content="Your LinkMaker profile - Manage your account and links">
+    <title>Profile - LinkMaker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Additional profile-specific styles */
+        .profile-section {
+            padding: 80px 0 60px;
+            min-height: 60vh;
+        }
+        
+        .profile-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0 auto 24px;
+        }
+        
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .profile-email {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .profile-email svg {
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+        }
+        
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .btn-profile {
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary-profile {
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .btn-primary-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-secondary-profile {
+            color: #475569;
+            background: #f1f5f9;
+        }
+        
+        .btn-secondary-profile:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger-profile {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+        
+        .btn-danger-profile:hover {
+            background: #fee2e2;
+            transform: translateY(-1px);
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 32px 0;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+        }
+        
+        .profile-stat-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        
+        .not-logged-in {
+            text-align: center;
+            padding: 80px 0;
+        }
+        
+        .not-logged-in h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+        
+        .not-logged-in p {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-card {
+                padding: 32px 24px;
+                margin: 0 24px;
+            }
+            
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+            
+            .profile-name {
+                font-size: 24px;
+            }
+            
+            .profile-stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <span class="logo-text">LinkMaker</span>
-                </a>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="logo-text">LinkMaker</span>
             </div>
             
             <ul class="nav-center">
-                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
                 <li><a href="about.html" class="nav-link">About</a></li>
             </ul>
             
-            <div class="nav-right">
-                <button class="btn-login" id="logoutBtnTop">Logout</button>
+            <div class="nav-right" id="navUserArea">
+                <button class="btn-login" id="loginBtn">Login</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="#features" class="mobile-link">Features</a>
+            <a href="about.html" class="mobile-link">About</a>
+            <div id="mobileUserArea">
+                <button class="btn-login mobile" id="mobileLoginBtn">Login</button>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main>
-        <section class="hero-section">
+        <!-- Profile Section -->
+        <section class="profile-section" id="profileSection">
             <div class="container">
-                <div class="badge">
-                    <span>USER PROFILE</span>
+                <div id="profileContent">
+                    <!-- Content will be dynamically inserted based on login state -->
                 </div>
-                <h1 class="hero-title">My <span class="text-blue">Account</span></h1>
             </div>
         </section>
 
-        <section class="dashboard-section" style="margin-top: -60px;">
-            <div class="container-small">
-                <div class="dashboard-card" style="text-align: left; padding: 48px;">
-                    <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e2e8f0;">
-                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);">
-                            K
+        <!-- Features Section (for mobile nav) -->
+        <section class="features-section" id="features">
+            <div class="container">
+                <h2 class="section-title">Why LinkMaker?</h2>
+                <p class="section-subtitle">Professional link management with enterprise-grade features</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
                         </div>
-                        <div>
-                            <h2 style="font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Krushna Anil Kaminwar</h2>
-                            <p style="color: #64748b; font-size: 18px;">Personal Account</p>
-                        </div>
+                        <h3 class="feature-title">Lightning Fast</h3>
+                        <p class="feature-description">Generate short links in milliseconds. Our optimized infrastructure ensures instant results every time.</p>
                     </div>
 
-                    <div style="display: grid; gap: 24px; margin-bottom: 40px;">
-                        <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; position: relative;">
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Full Name</label>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <input type="text" id="userNameInput" value="Krushna Anil Kaminwar" style="font-size: 18px; color: #0f172a; font-weight: 600; background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 4px 8px; width: 100%; transition: all 0.2s ease;" spellcheck="false">
-                                <button id="editNameBtn" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; font-weight: 600; color: #2563eb; white-space: nowrap;">Edit</button>
-                            </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                         </div>
-
-                        <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Email Address</label>
-                            <p style="font-size: 18px; color: #0f172a; font-weight: 600;">krishnakaminwar021@gmail.com</p>
-                        </div>
+                        <h3 class="feature-title">Privacy First</h3>
+                        <p class="feature-description">Your data is yours. We never track, sell, or share your information. Complete privacy guaranteed.</p>
                     </div>
 
-                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                        <button id="logoutBtnMain" class="btn-primary" style="background: #ef4444; border: none;">Logout</button>
-                        <a href="index.html" class="btn-login" style="text-decoration: none; padding: 14px 28px;">Back to Dashboard</a>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Deep Insights</h3>
+                        <p class="feature-description">Track clicks, analyze traffic, and understand your audience with powerful analytics dashboards.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text">LinkMaker</span>
+                    </div>
+                </div>
+
+                <div class="footer-right">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="cookies.html" class="footer-link">Cookies</a>
+                    <a href="contact.html" class="footer-link">Contact Support</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 LinkMaker. Designed with care.</p>
+                
+                <div class="footer-social">
+                    <a href="https://www.linkedin.com/in/krushna-kaminwar-90b575340?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/s24kaminwarkrushna-beep?tab=repositories" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
     <script>
-        const nameInput = document.getElementById('userNameInput');
-        const editBtn = document.getElementById('editNameBtn');
-
-        // Load saved name
-        const savedName = localStorage.getItem('userDisplayName');
-        if (savedName) {
-            nameInput.value = savedName;
-        }
-
-        editBtn.addEventListener('click', () => {
-            if (nameInput.style.borderColor === 'transparent') {
-                // Switch to edit mode
-                nameInput.style.borderColor = '#cbd5e1';
-                nameInput.style.background = 'white';
-                nameInput.focus();
-                editBtn.textContent = 'Save';
-            } else {
-                // Save name
-                const newName = nameInput.value.trim();
-                if (newName) {
-                    localStorage.setItem('userDisplayName', newName);
-                    nameInput.style.borderColor = 'transparent';
-                    nameInput.style.background = 'transparent';
-                    editBtn.textContent = 'Edit';
-                    
-                    // Show small toast/feedback if needed
-                    alert('Name updated successfully!');
-                }
+        // Profile page specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileContent = document.getElementById('profileContent');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            if (!isLoggedIn) {
+                // Show not logged in state
+                profileContent.innerHTML = `
+                    <div class="not-logged-in">
+                        <h2>You're not logged in</h2>
+                        <p>Please log in to view your profile and manage your links.</p>
+                        <div class="cta-buttons">
+                            <button class="btn-cta-primary" onclick="window.location.href='index.html'">Go to Home</button>
+                        </div>
+                    </div>
+                `;
+                return;
             }
+            
+            // Get user data
+            const userName = localStorage.getItem('userDisplayName') || 'User';
+            const userEmail = localStorage.getItem('userEmail') || 'email@example.com';
+            const initial = userName.charAt(0).toUpperCase();
+            
+            // Load stats from localStorage
+            let totalLinks = 0;
+            let totalClicks = 0;
+            
+            try {
+                const savedLinks = localStorage.getItem('linksHistory');
+                const savedDashboard = localStorage.getItem('dashboardData');
+                
+                if (savedLinks) {
+                    const links = JSON.parse(savedLinks);
+                    totalLinks = links.length;
+                    totalClicks = links.reduce((sum, link) => sum + (link.clicks || 0), 0);
+                }
+                
+                if (savedDashboard) {
+                    const dashboard = JSON.parse(savedDashboard);
+                    // Use the dashboard data if available
+                }
+            } catch (e) {
+                console.log('Could not load stats');
+            }
+            
+            // Show profile with user data
+            profileContent.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-avatar">${initial}</div>
+                    
+                    <h1 class="profile-name">${userName}</h1>
+                    
+                    <div class="profile-email">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                        ${userEmail}
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">${totalLinks}</div>
+                            <div class="profile-stat-label">Total Links</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">${totalClicks}</div>
+                            <div class="profile-stat-label">Total Clicks</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value">100%</div>
+                            <div class="profile-stat-label">Active Links</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button class="btn-profile btn-primary-profile" onclick="window.location.href='index.html'">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            Back to LinkMaker
+                        </button>
+                        
+                        <button class="btn-profile btn-secondary-profile" onclick="window.location.reload()">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                            </svg>
+                            Refresh Stats
+                        </button>
+                        
+                        <button class="btn-profile btn-danger-profile" onclick="logoutUser()">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                            </svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            `;
         });
-
-        // Simple script to handle logout on this specific page
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userDisplayName');
-            window.location.href = 'index.html';
-        }
-        document.getElementById('logoutBtnTop').addEventListener('click', logout);
-        document.getElementById('logoutBtnMain').addEventListener('click', logout);
-
-        // Redirect if not logged in
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'index.html';
-        }
     </script>
 </body>
 </html>
