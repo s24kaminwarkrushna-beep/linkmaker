@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - LinkMaker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">LinkMaker</span>
+                </a>
+            </div>
+            
+            <ul class="nav-center">
+                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <button class="btn-login" id="logoutBtnTop">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <div class="badge">
+                    <span>USER PROFILE</span>
+                </div>
+                <h1 class="hero-title">My <span class="text-blue">Account</span></h1>
+            </div>
+        </section>
+
+        <section class="dashboard-section" style="margin-top: -60px;">
+            <div class="container-small">
+                <div class="dashboard-card" style="text-align: left; padding: 48px;">
+                    <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);">
+                            K
+                        </div>
+                        <div>
+                            <h2 style="font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Krushna Anil Kaminwar</h2>
+                            <p style="color: #64748b; font-size: 18px;">Personal Account</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; gap: 24px; margin-bottom: 40px;">
+                        <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; position: relative;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Full Name</label>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <input type="text" id="userNameInput" value="Krushna Anil Kaminwar" style="font-size: 18px; color: #0f172a; font-weight: 600; background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 4px 8px; width: 100%; transition: all 0.2s ease;" spellcheck="false">
+                                <button id="editNameBtn" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; font-weight: 600; color: #2563eb; white-space: nowrap;">Edit</button>
+                            </div>
+                        </div>
+
+                        <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Email Address</label>
+                            <p style="font-size: 18px; color: #0f172a; font-weight: 600;">krishnakaminwar021@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <button id="logoutBtnMain" class="btn-primary" style="background: #ef4444; border: none;">Logout</button>
+                        <a href="index.html" class="btn-login" style="text-decoration: none; padding: 14px 28px;">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const nameInput = document.getElementById('userNameInput');
+        const editBtn = document.getElementById('editNameBtn');
+
+        // Load saved name
+        const savedName = localStorage.getItem('userDisplayName');
+        if (savedName) {
+            nameInput.value = savedName;
+        }
+
+        editBtn.addEventListener('click', () => {
+            if (nameInput.style.borderColor === 'transparent') {
+                // Switch to edit mode
+                nameInput.style.borderColor = '#cbd5e1';
+                nameInput.style.background = 'white';
+                nameInput.focus();
+                editBtn.textContent = 'Save';
+            } else {
+                // Save name
+                const newName = nameInput.value.trim();
+                if (newName) {
+                    localStorage.setItem('userDisplayName', newName);
+                    nameInput.style.borderColor = 'transparent';
+                    nameInput.style.background = 'transparent';
+                    editBtn.textContent = 'Edit';
+                    
+                    // Show small toast/feedback if needed
+                    alert('Name updated successfully!');
+                }
+            }
+        });
+
+        // Simple script to handle logout on this specific page
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userDisplayName');
+            window.location.href = 'index.html';
+        }
+        document.getElementById('logoutBtnTop').addEventListener('click', logout);
+        document.getElementById('logoutBtnMain').addEventListener('click', logout);
+
+        // Redirect if not logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

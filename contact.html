@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support - LinkMaker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">LinkMaker</span>
+                </a>
+            </div>
+            
+            <ul class="nav-center">
+                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+            </ul>
+            
+            <div class="nav-right" id="navUserArea">
+                <button class="btn-login" id="navLoginBtn">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <div class="badge">
+                    <span>GET IN TOUCH</span>
+                </div>
+                <h1 class="hero-title">Contact <span class="text-blue">Support</span></h1>
+            </div>
+        </section>
+
+        <section class="dashboard-section" style="margin-top: -60px;">
+            <div class="container-small">
+                <div class="dashboard-card" style="text-align: center; padding: 60px 40px;">
+                    <div style="width: 80px; height: 80px; background: #eff6ff; color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;">
+                        <svg style="width: 40px; height: 40px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+
+                    <h2 style="font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 20px;">Contact Support</h2>
+                    
+                    <div style="font-size: 18px; color: #475569; line-height: 1.8; max-width: 500px; margin: 0 auto 40px;">
+                        <p style="margin-bottom: 10px;">Have questions, feedback, or facing any issues?</p>
+                        <p>Reach out to us anytime — we’re happy to help.</p>
+                    </div>
+
+                    <a href="mailto:krishnakaminwar021@gmail.com" style="display: inline-block; font-size: 24px; font-weight: 700; color: #2563eb; text-decoration: none; padding: 20px 40px; background: #f0f7ff; border-radius: 16px; margin-bottom: 40px; transition: all 0.2s ease;" onmouseover="this.style.background='#e0efff'" onmouseout="this.style.background='#f0f7ff'">
+                        📧 krishnakaminwar021@gmail.com
+                    </a>
+
+                    <p style="font-size: 15px; color: #64748b; font-style: italic; border-top: 1px solid #e2e8f0; padding-top: 30px;">
+                        Your feedback helps us improve our platform.
+                    </p>
+
+                    <div style="margin-top: 40px;">
+                        <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 14px 28px;">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 LinkMaker. Designed with care.</p>
+                <div class="footer-social">
+                    <a href="https://www.linkedin.com/in/krushna-kaminwar-90b575340?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
