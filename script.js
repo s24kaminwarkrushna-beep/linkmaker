@@ -133,7 +133,7 @@ function hideError() {
  * @param {string} originalURL - The original long URL
  */
 function showResult(shortCode, originalURL) {
-    const shortURL = `linkmaker.in/${shortCode}`;
+    const shortURL = `linkmaker.in/#/${shortCode}`;
     const fullShortURL = `https://${shortURL}`;
     
     shortLinkDisplay.textContent = shortURL;
@@ -297,11 +297,11 @@ function renderLinksTable() {
     tableBody.innerHTML = sortedLinks.map((link, index) => `
         <tr data-index="${index}">
             <td class="original-url-cell" title="${link.originalUrl}">${link.originalUrl}</td>
-            <td class="short-url-cell">linkmaker.in/${link.shortCode}</td>
+            <td class="short-url-cell">linkmaker.in/#/${link.shortCode}</td>
             <td class="date-cell">${formatDate(link.createdAt)}</td>
             <td>
                 <div class="actions-cell">
-                    <button class="btn-table-copy" data-url="https://linkmaker.in/${link.shortCode}">
+                    <button class="btn-table-copy" data-url="https://linkmaker.in/#/${link.shortCode}">
                         Copy
                     </button>
                     <button class="btn-table-delete" data-code="${link.shortCode}">
@@ -633,13 +633,26 @@ function handleRedirect(shortCode) {
 
 /**
  * Checks if the current URL contains a short code and simulates redirect
+ * Optimized for /#/abc123 format
  */
 function checkForRedirect() {
+    // Check hash for short code (e.g., #/abc123)
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#/')) {
+        const shortCode = hash.substring(2);
+        if (urlDatabase.has(shortCode)) {
+            handleRedirect(shortCode);
+            // Clear hash after redirect to clean up URL
+            window.location.hash = '';
+            return;
+        }
+    }
+
+    // Legacy support for ?short=abc123
     const urlParams = new URLSearchParams(window.location.search);
-    const shortCode = urlParams.get('short');
-    
-    if (shortCode && urlDatabase.has(shortCode)) {
-        handleRedirect(shortCode);
+    const legacyShortCode = urlParams.get('short');
+    if (legacyShortCode && urlDatabase.has(legacyShortCode)) {
+        handleRedirect(legacyShortCode);
     }
 }
 
@@ -846,20 +859,27 @@ function initLogin() {
     function updateUIForLogin() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         if (isLoggedIn) {
+            let userName = localStorage.getItem('userDisplayName') || 'Krushna Anil Kaminwar';
+            // Shorten name for nav if too long
+            const displayNavName = userName.length > 12 ? userName.substring(0, 10) + '...' : userName;
+            const userInitial = userName.charAt(0).toUpperCase();
+
             if (navUserArea) {
                 navUserArea.innerHTML = `
                     <div class="user-profile-nav" onclick="window.location.href='profile.html'">
-                        <div class="user-avatar">K</div>
-                        <span class="user-name">My Account</span>
+                        <div class="user-avatar">${userInitial}</div>
+                        <span class="user-name">${displayNavName}</span>
                     </div>
                 `;
             }
             if (mobileUserArea) {
                 mobileUserArea.innerHTML = `
                     <div class="mobile-user-profile">
-                        <div class="user-avatar">K</div>
-                        <span class="user-name">My Account</span>
-                        <a href="#" class="logout-link" id="logoutBtn">Logout</a>
+                        <div class="user-avatar">${userInitial}</div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="user-name" onclick="window.location.href='profile.html'">${userName}</span>
+                            <a href="#" class="logout-link" id="logoutBtn" style="margin-left: 0; margin-top: 4px;">Logout</a>
+                        </div>
                     </div>
                 `;
                 const logoutBtn = document.getElementById('logoutBtn');
@@ -902,6 +922,7 @@ function initLogin() {
             
             loginModal.classList.add('hidden');
             updateUIForLogin();
+            window.location.reload(); // Refresh to sync UI across components
         });
     }
 
