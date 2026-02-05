@@ -1,6 +1,5 @@
 // ========================================
 // FIREBASE SETUP
-// LINKMAKER - URL SHORTENER APPLICATION
 // ========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
@@ -50,7 +49,6 @@ closeModal?.addEventListener("click", () => {
 // ========================================
 // GLOBAL DATA
 // ========================================
-// Storage for URL mappings with metadata
 const urlDatabase = new Map();
 const linksHistory = [];
 
@@ -182,154 +180,628 @@ function updateUIForLogin() {
 // ========================================
 // DOM ELEMENTS
 // ========================================
-// DOM Elements
 const urlInput = document.getElementById('urlInput');
 const shortenBtn = document.getElementById('shortenBtn');
 const btnText = document.querySelector('.btn-text');
-@@ -201,6 +28,7 @@ const totalLinksEl = document.getElementById('totalLinks');
+const btnArrow = document.querySelector('.btn-arrow');
+const btnLoader = document.querySelector('.btn-loader');
+const errorMessage = document.getElementById('errorMessage');
+const errorText = document.getElementById('errorText');
+const resultCard = document.getElementById('resultCard');
+const shortLinkDisplay = document.getElementById('shortLinkDisplay');
+const originalUrlText = document.getElementById('originalUrlText');
+const copyBtn = document.getElementById('copyBtn');
+const copySuccess = document.getElementById('copySuccess');
+const qrBtn = document.getElementById('qrBtn');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+// Dashboard Elements
+const totalLinksEl = document.getElementById('totalLinks');
 const totalClicksEl = document.getElementById('totalClicks');
 const activeLinksEl = document.getElementById('activeLinks');
 const linkChangeEl = document.getElementById('linkChange');
-// refreshBtn removed
 
 // Dashboard Data
 let dashboardData = {
-@@ -306,12 +134,11 @@ function hideError() {
-*/
-function showResult(shortCode, originalURL) {
-const shortURL = `linkmaker.in/#/${shortCode}`;
-    const fullShortURL = `https://${shortURL}`;
+    totalLinks: 0,
+    totalClicks: 0,
+    todayLinks: 0,
+    lastUpdate: new Date().toDateString()
+};
 
-shortLinkDisplay.textContent = shortURL;
-originalUrlText.textContent = originalURL;
-
-    // Generate QR code for the ORIGINAL long URL
-    // Generate QR code DIRECTLY for the original long URL
-generateQRCode(originalURL);
-
-// Show result card with animation
-@@ -378,6 +205,8 @@ function animateCounter(element, start, end) {
-}, 16);
-}
-
-
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
 
 /**
-* Save dashboard data to localStorage
-*/
-@@ -581,10 +410,8 @@ function loadLinksHistory() {
-async function handleShortenURL() {
-const url = urlInput.value.trim();
-
-    // Hide any previous errors and results
-hideError();
-
-    // Validate URL
-if (!url) {
-showError('Please enter a URL');
-return;
-@@ -595,44 +422,37 @@ async function handleShortenURL() {
-return;
+ * Validates if the provided string is a valid URL
+ * @param {string} string - The URL string to validate
+ * @returns {boolean} - True if valid URL, false otherwise
+ */
+function isValidURL(string) {
+    // Remove leading/trailing whitespace
+    string = string.trim();
+    
+    // Check if empty
+    if (!string) {
+        return false;
+    }
+    
+    // Add protocol if missing
+    if (!string.match(/^https?:\/\//i)) {
+        string = 'http://' + string;
+    }
+    
+    // URL validation pattern
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+    
+    try {
+        const url = new URL(string);
+        return urlPattern.test(string) && (url.protocol === 'http:' || url.protocol === 'https:');
+    } catch (e) {
+        return false;
+    }
 }
 
+/**
+ * Normalizes URL by ensuring it has a protocol
+ * @param {string} url - The URL to normalize
+ * @returns {string} - Normalized URL with protocol
+ */
+function normalizeURL(url) {
+    url = url.trim();
+    if (!url.match(/^https?:\/\//i)) {
+        return 'http://' + url;
+    }
+    return url;
+}
+
+/**
+ * Generates a random short code for the shortened URL
+ * @param {number} length - Length of the short code
+ * @returns {string} - Random alphanumeric code
+ */
+function generateShortCode(length = 6) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    // Check if code already exists, regenerate if it does
+    if (urlDatabase.has(result)) {
+        return generateShortCode(length);
+    }
+    
+    return result;
+}
+
+/**
+ * Shows error message with custom text
+ * @param {string} message - Error message to display
+ */
+function showError(message) {
+    errorText.textContent = message;
+    errorMessage.classList.remove('hidden');
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        hideError();
+    }, 4000);
+}
+
+/**
+ * Hides error message
+ */
+function hideError() {
+    errorMessage.classList.add('hidden');
+}
+
+/**
+ * Shows the result card with the shortened link
+ * @param {string} shortCode - The generated short code
+ * @param {string} originalURL - The original long URL
+ */
+function showResult(shortCode, originalURL) {
+    const shortURL = `linkmaker.in/#/${shortCode}`;
+    const fullShortURL = `https://${shortURL}`;
+    
+    shortLinkDisplay.textContent = shortURL;
+    originalUrlText.textContent = originalURL;
+    
+    // Generate QR code for the ORIGINAL long URL
+    generateQRCode(originalURL);
+    
+    // Show result card with animation
+    resultCard.classList.remove('hidden');
+    
+    // Scroll to result
+    setTimeout(() => {
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+/**
+ * Hides the result card
+ */
+function hideResult() {
+    resultCard.classList.add('hidden');
+    copySuccess.classList.add('hidden');
+}
+
+/**
+ * Updates the dashboard statistics
+ */
+function updateDashboard() {
+    // Update total links
+    dashboardData.totalLinks = urlDatabase.size;
+    
+    // Check if it's a new day
+    const today = new Date().toDateString();
+    if (dashboardData.lastUpdate !== today) {
+        dashboardData.todayLinks = 0;
+        dashboardData.lastUpdate = today;
+    }
+    
+    // Calculate actual total clicks from links history
+    dashboardData.totalClicks = linksHistory.reduce((sum, link) => sum + (link.clicks || 0), 0);
+    
+    // Update DOM
+    animateCounter(totalLinksEl, parseInt(totalLinksEl.textContent) || 0, dashboardData.totalLinks);
+    animateCounter(totalClicksEl, parseInt(totalClicksEl.textContent) || 0, dashboardData.totalClicks);
+    animateCounter(activeLinksEl, parseInt(activeLinksEl.textContent) || 0, dashboardData.totalLinks);
+    
+    linkChangeEl.textContent = `+${dashboardData.todayLinks} today`;
+    
+    // Save to localStorage
+    saveDashboardData();
+}
+
+/**
+ * Animates counter from start to end
+ */
+function animateCounter(element, start, end) {
+    const duration = 1000;
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+        }
+        element.textContent = Math.floor(current).toLocaleString();
+    }, 16);
+}
+
+/**
+ * Save dashboard data to localStorage
+ */
+function saveDashboardData() {
+    try {
+        localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+    } catch (e) {
+        console.log('Could not save dashboard data');
+    }
+}
+
+/**
+ * Load dashboard data from localStorage
+ */
+function loadDashboardData() {
+    try {
+        const saved = localStorage.getItem('dashboardData');
+        if (saved) {
+            dashboardData = JSON.parse(saved);
+            
+            // Check if it's a new day
+            const today = new Date().toDateString();
+            if (dashboardData.lastUpdate !== today) {
+                dashboardData.todayLinks = 0;
+                dashboardData.lastUpdate = today;
+            }
+        }
+    } catch (e) {
+        console.log('Could not load dashboard data');
+    }
+}
+
+/**
+ * Formats a date to a readable string
+ */
+function formatDate(date) {
+    const now = new Date();
+    const linkDate = new Date(date);
+    const diffTime = Math.abs(now - linkDate);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+        const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+        if (diffHours === 0) {
+            const diffMinutes = Math.floor(diffTime / (1000 * 60));
+            if (diffMinutes === 0) {
+                return 'Just now';
+            }
+            return `${diffMinutes}m ago`;
+        }
+        return `${diffHours}h ago`;
+    } else if (diffDays === 1) {
+        return 'Yesterday';
+    } else if (diffDays < 7) {
+        return `${diffDays} days ago`;
+    } else {
+        return linkDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+}
+
+/**
+ * Renders the links table
+ */
+function renderLinksTable() {
+    const tableBody = document.getElementById('linksTableBody');
+    
+    if (linksHistory.length === 0) {
+        tableBody.innerHTML = `
+            <tr class="empty-state">
+                <td colspan="4">
+                    <div class="empty-message">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                        <p>No links shortened yet</p>
+                        <span>Start by shortening your first link above</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Sort by date (newest first)
+    const sortedLinks = [...linksHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    tableBody.innerHTML = sortedLinks.map((link, index) => `
+        <tr data-index="${index}">
+            <td class="original-url-cell" title="${link.originalUrl}">${link.originalUrl}</td>
+            <td class="short-url-cell">linkmaker.in/#/${link.shortCode}</td>
+            <td class="date-cell">${formatDate(link.createdAt)}</td>
+            <td>
+                <div class="actions-cell">
+                    <button class="btn-table-copy" data-url="https://linkmaker.in/#/${link.shortCode}">
+                        Copy
+                    </button>
+                    <button class="btn-table-delete" data-code="${link.shortCode}">
+                        Delete
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Add event listeners to copy buttons
+    tableBody.querySelectorAll('.btn-table-copy').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const url = e.target.getAttribute('data-url');
+            try {
+                await navigator.clipboard.writeText(url);
+                e.target.textContent = 'Copied!';
+                e.target.classList.add('copied');
+                setTimeout(() => {
+                    e.target.textContent = 'Copy';
+                    e.target.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+        });
+    });
+    
+    // Add event listeners to delete buttons
+    tableBody.querySelectorAll('.btn-table-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const shortCode = e.target.getAttribute('data-code');
+            deleteLink(shortCode);
+        });
+    });
+}
+
+/**
+ * Adds a new link to the history
+ */
+function addLinkToHistory(shortCode, originalUrl) {
+    const linkData = {
+        shortCode: shortCode,
+        originalUrl: originalUrl,
+        clicks: 0,
+        createdAt: new Date().toISOString()
+    };
+    
+    linksHistory.push(linkData);
+    saveLinksHistory();
+    renderLinksTable();
+}
+
+/**
+ * Deletes a link from history
+ */
+function deleteLink(shortCode) {
+    const index = linksHistory.findIndex(link => link.shortCode === shortCode);
+    if (index > -1) {
+        linksHistory.splice(index, 1);
+        urlDatabase.delete(shortCode);
+        saveLinksHistory();
+        saveToLocalStorage();
+        renderLinksTable();
+        updateDashboard();
+    }
+}
+
+/**
+ * Save links history to localStorage
+ */
+function saveLinksHistory() {
+    try {
+        localStorage.setItem('linksHistory', JSON.stringify(linksHistory));
+    } catch (e) {
+        console.log('Could not save links history');
+    }
+}
+
+/**
+ * Load links history from localStorage
+ */
+function loadLinksHistory() {
+    try {
+        const saved = localStorage.getItem('linksHistory');
+        if (saved) {
+            const history = JSON.parse(saved);
+            linksHistory.push(...history);
+            
+            // Restore urlDatabase from history
+            history.forEach(link => {
+                urlDatabase.set(link.shortCode, link.originalUrl);
+            });
+        }
+    } catch (e) {
+        console.log('Could not load links history');
+    }
+}
+
+// ========================================
+// EVENT HANDLERS
+// ========================================
+
+/**
+ * Handles the URL shortening process
+ */
+async function handleShortenURL() {
+    const url = urlInput.value.trim();
+    
+    // Hide any previous errors and results
+    hideError();
+    
+    // Validate URL
+    if (!url) {
+        showError('Please enter a URL');
+        return;
+    }
+    
+    if (!isValidURL(url)) {
+        showError('Please enter a valid URL (e.g., https://example.com)');
+        return;
+    }
+    
     // Normalize URL
-const normalizedURL = normalizeURL(url);
-
+    const normalizedURL = normalizeURL(url);
+    
     // Show loading state
-shortenBtn.disabled = true;
-btnText.classList.add('hidden');
-btnArrow.classList.add('hidden');
-btnLoader.classList.remove('hidden');
-
+    shortenBtn.disabled = true;
+    btnText.classList.add('hidden');
+    btnArrow.classList.add('hidden');
+    btnLoader.classList.remove('hidden');
+    
     // Simulate processing delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await new Promise(resolve => setTimeout(resolve, 800));
-
+    
     // Generate short code
-const shortCode = generateShortCode();
-
+    const shortCode = generateShortCode();
+    
     // Store mapping
-    // Save to Map
-urlDatabase.set(shortCode, normalizedURL);
-
+    urlDatabase.set(shortCode, normalizedURL);
+    
     // Add to history table
     addLinkToHistory(shortCode, normalizedURL);
     
     // Save to localStorage for persistence
-    // Save to persistent storage immediately
-saveToLocalStorage();
-
-    // Update dashboard
-    // Add to history and update UI
-    addLinkToHistory(shortCode, normalizedURL);
+    saveToLocalStorage();
     
-dashboardData.todayLinks++;
-updateDashboard();
-
+    // Update dashboard
+    dashboardData.todayLinks++;
+    updateDashboard();
+    
     // Show result
-    // Display result
-showResult(shortCode, normalizedURL);
-
+    showResult(shortCode, normalizedURL);
+    
     // Reset button state
-shortenBtn.disabled = false;
-btnText.classList.remove('hidden');
-btnArrow.classList.remove('hidden');
-btnLoader.classList.add('hidden');
-
+    shortenBtn.disabled = false;
+    btnText.classList.remove('hidden');
+    btnArrow.classList.remove('hidden');
+    btnLoader.classList.add('hidden');
+    
     // Clear input
-urlInput.value = '';
+    urlInput.value = '';
 }
 
-@@ -686,13 +506,13 @@ async function handleCopyLink() {
+/**
+ * Handles copying the shortened link to clipboard
+ */
+async function handleCopyLink() {
+    const shortURL = 'https://' + shortLinkDisplay.textContent;
+    
+    try {
+        // Use Clipboard API
+        await navigator.clipboard.writeText(shortURL);
+        
+        // Show success feedback
+        copyBtn.classList.add('copied');
+        const originalText = copyBtn.querySelector('.copy-text').textContent;
+        copyBtn.querySelector('.copy-text').textContent = 'Copied!';
+        copySuccess.classList.remove('hidden');
+        
+        // Reset after 2 seconds
+        setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyBtn.querySelector('.copy-text').textContent = originalText;
+            copySuccess.classList.add('hidden');
+        }, 2000);
+        
+    } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = shortURL;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            copyBtn.querySelector('.copy-text').textContent = 'Copied!';
+            copySuccess.classList.remove('hidden');
+            
+            setTimeout(() => {
+                copyBtn.querySelector('.copy-text').textContent = 'Copy Link';
+                copySuccess.classList.add('hidden');
+            }, 2000);
+        } catch (e) {
+            console.error('Copy failed', e);
+        }
+        
+        document.body.removeChild(textArea);
+    }
 }
 
 /**
  * Generates a QR code for the shortened link
- * Generates a QR code for the original link
-* @param {string} text - The text to encode in the QR code
-*/
+ * @param {string} text - The text to encode in the QR code
+ */
 function generateQRCode(text) {
-const qrContainer = document.getElementById('qrCode');
-
+    const qrContainer = document.getElementById('qrCode');
+    
     // Uses the original long URL for the QR code for instant cross-device scannability
-    // Use the original long URL for the QR code
-const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}&margin=10`;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}&margin=10`;
+    
+    qrContainer.innerHTML = `
+        <img src="${qrApiUrl}" alt="QR Code" style="width: 100%; height: 100%; border-radius: 8px;" />
+    `;
+}
 
-qrContainer.innerHTML = `
-@@ -704,13 +524,11 @@ function generateQRCode(text) {
-* Handles QR code button click - downloads the QR code
-*/
+/**
+ * Handles QR code button click - downloads the QR code
+ */
 function handleQRClick() {
     // Get the original URL from the display element
-const originalURL = originalUrlText.textContent;
-
-// Use the original long URL for the download too
-const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
-
+    const originalURL = originalUrlText.textContent;
+    
+    // Use the original long URL for the download too
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
+    
     // Create a temporary link and trigger download
-const link = document.createElement('a');
-link.href = qrApiUrl;
-link.download = `qr-code-original.png`;
-@@ -791,10 +609,12 @@ function handleRedirect(shortCode) {
-updateDashboard();
+    const link = document.createElement('a');
+    link.href = qrApiUrl;
+    link.download = `qr-code-original.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
+
+/**
+ * Toggles mobile menu
+ */
+function toggleMobileMenu() {
+    mobileMenu.classList.toggle('active');
+    
+    // Animate hamburger menu
+    const spans = mobileMenuToggle.querySelectorAll('span');
+    if (mobileMenu.classList.contains('active')) {
+        spans[0].style.transform = 'rotate(45deg) translateY(8px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translateY(-8px)';
+    } else {
+        spans[0].style.transform = 'none';
+        spans[1].style.opacity = '1';
+        spans[2].style.transform = 'none';
+    }
+}
+
+// ========================================
+// LOCAL STORAGE FUNCTIONS
+// ========================================
+
+/**
+ * Save data to localStorage for persistence
+ */
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem('urlDatabase', JSON.stringify(Array.from(urlDatabase.entries())));
+    } catch (e) {
+        console.log('LocalStorage not available');
+    }
+}
+
+/**
+ * Load data from localStorage
+ */
+function loadFromLocalStorage() {
+    try {
+        const savedDatabase = localStorage.getItem('urlDatabase');
+        
+        if (savedDatabase) {
+            const entries = JSON.parse(savedDatabase);
+            entries.forEach(([key, value]) => {
+                urlDatabase.set(key, value);
+            });
+        }
+    } catch (e) {
+        console.log('Could not load from localStorage');
+    }
+}
+
+// ========================================
+// REDIRECT SIMULATION
+// ========================================
+
+/**
+ * Simulates link redirection
+ * @param {string} shortCode - The short code to redirect
+ */
+function handleRedirect(shortCode) {
+    const originalURL = urlDatabase.get(shortCode);
+    
+    if (originalURL) {
+        // Track the click in history
+        const linkIndex = linksHistory.findIndex(l => l.shortCode === shortCode);
+        if (linkIndex !== -1) {
+            linksHistory[linkIndex].clicks = (linksHistory[linkIndex].clicks || 0) + 1;
+            saveLinksHistory();
+            updateDashboard();
+        }
 
         // Direct redirection
         window.location.href = originalURL;
     } else {
         alert('Short link not found!');
-        // Direct redirection with absolute priority
-        console.log('Redirecting to:', originalURL);
-        
-        // Force immediate navigation to original URL
-        // We use replace to prevent the back-button loop
-        window.location.replace(originalURL);
-}
+    }
 }
 
-@@ -803,22 +623,49 @@ function handleRedirect(shortCode) {
-* Optimized for /#/abc123 format
-*/
+/**
+ * Checks if the current URL contains a short code and simulates redirect
+ * Optimized for /#/abc123 format
+ */
 function checkForRedirect() {
     // Check hash for short code (e.g., #/abc123)
     const hash = window.location.hash;
@@ -340,242 +812,226 @@ function checkForRedirect() {
             return;
         }
     }
-    let hash = window.location.hash;
-    
-    if (hash) {
-        // Clean the code: remove all leading # and / characters
-        const shortCode = hash.replace(/^[#/]+/, "");
 
     // Legacy support for ?short=abc123
     const urlParams = new URLSearchParams(window.location.search);
     const legacyShortCode = urlParams.get('short');
     if (legacyShortCode && urlDatabase.has(legacyShortCode)) {
         handleRedirect(legacyShortCode);
-        if (shortCode && shortCode.length > 0) {
-            // 1. Check in-memory database
-            let destination = urlDatabase.get(shortCode);
-            
-            // 2. Check persistent history array
-            if (!destination) {
-                const history = JSON.parse(localStorage.getItem('linksHistory') || '[]');
-                const found = history.find(l => l.shortCode === shortCode);
-                if (found) destination = found.originalUrl;
-            }
-
-            // 3. Fallback: Check raw urlDatabase in localStorage
-            if (!destination) {
-                const savedDb = JSON.parse(localStorage.getItem('urlDatabase') || '[]');
-                const foundInDb = savedDb.find(entry => entry[0] === shortCode);
-                if (foundInDb) destination = foundInDb[1];
-            }
-
-            if (destination) {
-                // FORCE REDIRECT: Ensure protocol exists
-                if (!destination.match(/^https?:\/\//i)) {
-                    destination = 'https://' + destination;
-                }
-
-                // Immediate hard redirect
-                window.location.replace(destination);
-                
-                // Fallback for some mobile browsers
-                setTimeout(() => {
-                    window.location.href = destination;
-                }, 50);
-                
-                return true;
-            }
-        }
-}
-    return false;
+    }
 }
 
 // ========================================
-@@ -880,7 +727,9 @@ copyBtn.addEventListener('click', handleCopyLink);
+// SMOOTH SCROLLING FOR NAVIGATION
+// ========================================
+
+/**
+ * Handles smooth scrolling for navigation links
+ */
+function handleNavigation() {
+    document.querySelectorAll('a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            
+            // If it's an internal hash link on the same page
+            if (href && href.startsWith('#')) {
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Close mobile menu if open
+                if (mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+            // External links or separate pages (like about.html) will behave normally
+        });
+    });
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+// Shorten button click
+shortenBtn.addEventListener('click', handleShortenURL);
+
+// Enter key in input field
+urlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleShortenURL();
+    }
+});
+
+// Input field focus - hide error
+urlInput.addEventListener('focus', () => {
+    hideError();
+});
+
+// Copy button click
+copyBtn.addEventListener('click', handleCopyLink);
+
+// QR button click
 qrBtn.addEventListener('click', handleQRClick);
 
 // Mobile menu toggle
 mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-if (mobileMenuToggle) {
-    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-}
 
 // Get Started CTA scroll
 const ctaShortenBtn = document.getElementById('ctaShortenBtn');
-@@ -894,6 +743,8 @@ if (ctaShortenBtn) {
-});
+if (ctaShortenBtn) {
+    ctaShortenBtn.addEventListener('click', () => {
+        const inputSection = document.querySelector('.input-section');
+        if (inputSection) {
+            inputSection.scrollIntoView({ behavior: 'smooth' });
+            urlInput.focus();
+        }
+    });
 }
-
-// Refresh functionality removed
 
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
-if (mobileMenu.classList.contains('active') && 
-@@ -959,11 +810,16 @@ function init() {
-// Update dashboard with current data
-updateDashboard();
+    if (mobileMenu.classList.contains('active') && 
+        !mobileMenu.contains(e.target) && 
+        !mobileMenuToggle.contains(e.target)) {
+        toggleMobileMenu();
+    }
+});
 
+// ========================================
+// SCROLL ANIMATIONS
+// ========================================
+
+/**
+ * Adds scroll-triggered animations
+ */
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe feature cards
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease-out';
+        observer.observe(card);
+    });
+}
+
+// ========================================
+// INITIALIZATION
+// ========================================
+
+/**
+ * Initialize the application
+ */
+function init() {
+    // Load saved data from localStorage
+    loadFromLocalStorage();
+    loadDashboardData();
+    loadLinksHistory();
+    
+    // Setup navigation
+    handleNavigation();
+    
+    // Initialize scroll animations
+    initScrollAnimations();
+    
+    // Render links table
+    renderLinksTable();
+    
+    // Update dashboard with current data
+    updateDashboard();
+    
     // Check for redirect parameters
-    // Check for redirect parameters IMMEDIATELY
-checkForRedirect();
-
+    checkForRedirect();
+    
     // Focus on input field
     urlInput.focus();
-    // Also listen for hash changes if the user scans while already on the page
-    window.addEventListener('hashchange', checkForRedirect);
     
-    // If we are currently redirecting, don't focus or log (optional but cleaner)
-    if (!window.location.hash) {
-        urlInput.focus();
-    }
-
-console.log('LinkMaker initialized successfully!');
-}
-@@ -1007,15 +863,147 @@ function initCookieConsent() {
-});
+    console.log('LinkMaker initialized successfully!');
 }
 
+// ========================================
+// START APPLICATION
+// ========================================
 
+// Cookie Consent Logic
+function initCookieConsent() {
+    const banner = document.getElementById('cookieConsent');
+    const acceptBtn = document.getElementById('acceptCookies');
+    const rejectBtn = document.getElementById('rejectCookies');
 
-// Login Logic
-function initLogin() {
-    const loginModal = document.getElementById('loginModal');
-    const loginBtn = document.getElementById('loginBtn');
-    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
-    const closeModal = document.getElementById('closeModal');
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const navUserArea = document.getElementById('navUserArea');
-    const mobileUserArea = document.getElementById('mobileUserArea');
-
-    function updateUIForLogin() {
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isLoggedIn) {
-            let userName = localStorage.getItem('userDisplayName') || 'Krushna Anil Kaminwar';
-            // Shorten name for nav if too long
-            const displayNavName = userName.length > 12 ? userName.substring(0, 10) + '...' : userName;
-            const userInitial = userName.charAt(0).toUpperCase();
-
-            if (navUserArea) {
-                navUserArea.innerHTML = `
-                    <div class="user-profile-nav" onclick="window.location.href='profile.html'">
-                        <div class="user-avatar">${userInitial}</div>
-                        <span class="user-name">${displayNavName}</span>
-                    </div>
-                `;
-            }
-            if (mobileUserArea) {
-                mobileUserArea.innerHTML = `
-                    <div class="mobile-user-profile">
-                        <div class="user-avatar">${userInitial}</div>
-                        <div style="display: flex; flex-direction: column;">
-                            <span class="user-name" onclick="window.location.href='profile.html'">${userName}</span>
-                            <a href="#" class="logout-link" id="logoutBtn" style="margin-left: 0; margin-top: 4px;">Logout</a>
-                        </div>
-                    </div>
-                `;
-                const logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        localStorage.removeItem('isLoggedIn');
-                        window.location.reload();
-                    });
-                }
-            }
-        }
-    }
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-        });
-    }
-
-    if (mobileLoginBtn) {
-        mobileLoginBtn.addEventListener('click', () => {
-            loginModal.classList.remove('hidden');
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            loginModal.classList.add('hidden');
-        });
-    }
-
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', () => {
-            const emailInput = document.getElementById('loginEmailInput');
-            const errorMsg = document.getElementById('loginError');
-            
-            let email = "";
-            if (emailInput) {
-                const inputVal = emailInput.value.trim();
-                // Basic Gmail validation
-                if (!inputVal || !inputVal.includes('@')) {
-                    if (errorMsg) errorMsg.classList.remove('hidden');
-                    return;
-                }
-                email = inputVal;
-            }
-
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', email);
-            
-            // Save join year only if it doesn't exist yet
-            if (!localStorage.getItem('joinYear')) {
-                localStorage.setItem('joinYear', new Date().getFullYear());
-            }
-            
-            localStorage.setItem('cookieChoice', 'accepted');
-            const cookieBanner = document.getElementById('cookieConsent');
-            if (cookieBanner) cookieBanner.classList.add('hidden');
-            
-            loginModal.classList.add('hidden');
-            updateUIForLogin();
-            window.location.reload();
-        });
-    }
-
-    if (!localStorage.getItem('isLoggedIn')) {
+    if (!localStorage.getItem('cookieChoice')) {
         setTimeout(() => {
-            if (!localStorage.getItem('isLoggedIn') && loginModal) {
-                loginModal.classList.remove('hidden');
-            }
+            banner.classList.remove('hidden');
         }, 1500);
     }
 
-    updateUIForLogin();
-    
-    // Check if on about page and update user info
-    if (window.location.pathname.includes('about.html')) {
-        const userInfoDisplay = document.getElementById('userInfoDisplay');
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isLoggedIn && userInfoDisplay) {
-            userInfoDisplay.classList.remove('hidden');
-        }
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('cookieChoice', 'accepted');
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100px)';
+        banner.style.transition = 'all 0.5s ease';
+        setTimeout(() => banner.classList.add('hidden'), 500);
+    });
+
+    // If user is already logged in, consider cookies accepted and hide banner
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+        localStorage.setItem('cookieChoice', 'accepted');
+        banner.classList.add('hidden');
     }
 
-    // Ensure Logo link works everywhere
-    const navLogo = document.getElementById('navLogo');
-    if (navLogo) {
-        navLogo.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-    }
+    rejectBtn.addEventListener('click', () => {
+        localStorage.setItem('cookieChoice', 'rejected');
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100px)';
+        banner.style.transition = 'all 0.5s ease';
+        setTimeout(() => banner.classList.add('hidden'), 500);
+    });
 }
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-document.addEventListener('DOMContentLoaded', () => {
-init();
-initCookieConsent();
-        initLogin();
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+        initCookieConsent();
+    });
 } else {
-init();
-initCookieConsent();
-    initLogin();
+    init();
+    initCookieConsent();
 }
 
 // ========================================
+// DEMO FUNCTIONALITY
+// ========================================
+
+/**
+ * Add some demo data for testing (optional)
+ * Uncomment to pre-populate with sample links
+ */
+function addDemoData() {
+    // Example usage:
+    // urlDatabase.set('demo1', 'https://www.example.com/very/long/url/path');
+    // urlDatabase.set('demo2', 'https://github.com/user/repository');
+    // saveToLocalStorage();
+}
+
+// Uncomment to add demo data
+// addDemoData();
