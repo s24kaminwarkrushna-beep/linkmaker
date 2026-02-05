@@ -9,6 +9,12 @@ signInWithPopup,
 onAuthStateChanged,
 signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 // 🔴 REPLACE WITH YOUR OWN FIREBASE CONFIG
 const firebaseConfig = {
@@ -21,6 +27,8 @@ appId: "1:247697787542:web:9e7a352fcff462cd0b10b7"
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
+
 
 provider.setCustomParameters({
 prompt: "select_account"
@@ -66,6 +74,14 @@ const result = await signInWithPopup(auth, provider);
 const user = result.user;
 
 console.log("✅ Logged in:", user.email);
+  // 🔥 SAVE USER TO FIRESTORE
+await setDoc(doc(db, "users", user.uid), {
+  name: user.displayName,
+  email: user.email,
+  photo: user.photoURL,
+  lastLogin: new Date()
+});
+
 
 // Save to localStorage for persistence across page reloads
 localStorage.setItem("isLoggedIn", "true");
