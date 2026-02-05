@@ -114,7 +114,7 @@
                             </div>
                         </div>
                         <h2 id="displayNameHeading" style="font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px;">Krushna Anil Kaminwar</h2>
-                        <p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since 2024</p>
+                        <p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since <span id="displayJoinYear">2024</span></p>
                     </div>
 
                     <!-- Profile Form -->
@@ -175,9 +175,22 @@
         // Load saved name and update UI
         function updateProfileUI() {
             const savedName = localStorage.getItem('userDisplayName') || "Krushna Anil Kaminwar";
+            const savedEmail = localStorage.getItem('userEmail') || "krishnakaminwar021@gmail.com";
+            const savedYear = localStorage.getItem('joinYear') || "2024";
+            
             nameInput.value = savedName;
             displayNameHeading.textContent = savedName;
             profileInitial.textContent = savedName.charAt(0).toUpperCase();
+            
+            // Check if userEmail exists in localStorage, otherwise use fallback
+            const actualEmail = localStorage.getItem('userEmail');
+            if (actualEmail) {
+                document.getElementById('userEmailDisplay').textContent = actualEmail;
+            } else {
+                document.getElementById('userEmailDisplay').textContent = savedEmail;
+            }
+            
+            document.getElementById('displayJoinYear').textContent = savedYear;
         }
 
         updateProfileUI();
