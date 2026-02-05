@@ -27,6 +27,7 @@
             <ul class="nav-center">
                 <li><a href="index.html#features" class="nav-link">Features</a></li>
                 <li><a href="about.html" class="nav-link active">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
             
             <div class="nav-right" id="navUserArea">
@@ -41,14 +42,23 @@
             </button>
         </div>
 
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="index.html#features" class="mobile-link">Features</a>
-            <a href="about.html" class="mobile-link active">About</a>
-            <div id="mobileUserArea">
-                <button class="btn-login mobile" id="mobileLoginBtn">Login</button>
-            </div>
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html#features" class="mobile-link">Features</a>
+        <a href="about.html" class="mobile-link active">About</a>
+        <a href="contact.html" class="mobile-link">Contact</a>
+        <div id="mobileUserArea">
+            <button class="btn-login mobile" id="mobileLoginBtn">Login</button>
         </div>
+    </div>
 
         <!-- Login Modal -->
         <div id="loginModal" class="modal-overlay hidden">
