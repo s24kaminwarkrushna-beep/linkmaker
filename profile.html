@@ -114,7 +114,8 @@ K
 </div>
 </div>
 <h2 id="displayNameHeading" style="font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px;">Krushna Anil Kaminwar</h2>
-<p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since <span id="displayJoinYear">2024</span></p>
+                        <p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since 2024</p>
+                        <p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since <span id="displayJoinYear">2024</span></p>
 </div>
 
 <!-- Profile Form -->
@@ -132,17 +133,17 @@ readonly spellcheck="false">
 <p style="font-size: 13px; color: #94a3b8; margin-top: 10px;">This name will be displayed across your shortened links and dashboard.</p>
 </div>
 
-                            <!-- Email Field -->
-                            <div class="profile-field-card" style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                                <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Login Email</label>
-                                <div style="display: flex; align-items: center; gap: 12px; color: #0f172a;">
-                                    <svg style="width: 20px; height: 20px; color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    <span id="userEmailDisplay" style="font-size: 18px; font-weight: 600; word-break: break-all;">krishnakaminwar021@gmail.com</span>
-                                </div>
-                                <p style="font-size: 13px; color: #94a3b8; margin-top: 10px;">Your primary email address linked to your Google Account.</p>
-                            </div>
+<!-- Email Field -->
+<div class="profile-field-card" style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
+<label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Login Email</label>
+<div style="display: flex; align-items: center; gap: 12px; color: #0f172a;">
+<svg style="width: 20px; height: 20px; color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+</svg>
+<span id="userEmailDisplay" style="font-size: 18px; font-weight: 600; word-break: break-all;">krishnakaminwar021@gmail.com</span>
+</div>
+<p style="font-size: 13px; color: #94a3b8; margin-top: 10px;">Your primary email address linked to your Google Account.</p>
+</div>
 </div>
 
 <!-- Action Buttons -->
@@ -176,12 +177,12 @@ const displayNameHeading = document.getElementById('displayNameHeading');
 function updateProfileUI() {
 const savedName = localStorage.getItem('userDisplayName') || "Krushna Anil Kaminwar";
             const savedEmail = localStorage.getItem('userEmail') || "krishnakaminwar021@gmail.com";
-const savedYear = localStorage.getItem('joinYear') || "2024";
-
+            const savedYear = localStorage.getItem('joinYear') || "2024";
+            
 nameInput.value = savedName;
 displayNameHeading.textContent = savedName;
 profileInitial.textContent = savedName.charAt(0).toUpperCase();
-
+            
             // Check if userEmail exists in localStorage, otherwise use fallback
             const actualEmail = localStorage.getItem('userEmail');
             if (actualEmail) {
@@ -190,7 +191,7 @@ profileInitial.textContent = savedName.charAt(0).toUpperCase();
                 document.getElementById('userEmailDisplay').textContent = savedEmail;
             }
             
-document.getElementById('displayJoinYear').textContent = savedYear;
+            document.getElementById('displayJoinYear').textContent = savedYear;
 }
 
 updateProfileUI();
