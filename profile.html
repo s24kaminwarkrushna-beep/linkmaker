@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - LinkMaker</title>
+    <meta name="description" content="Shorten your links instantly with LinkMaker - Trusted by professionals. No sign-up required.">
+    <title>LinkMaker - Shorten your links. Instantly.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,158 +15,431 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
-                        </svg>
-                    </div>
-                    <span class="logo-text">LinkMaker</span>
-                </a>
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <span class="logo-text">LinkMaker</span>
             </div>
             
             <ul class="nav-center">
                 <li><a href="index.html#features" class="nav-link">Features</a></li>
                 <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
             
-            <div class="nav-right">
-                <button class="btn-login" id="logoutBtnTop">Logout</button>
+            <div class="nav-right" id="navUserArea">
+                <button class="btn-login" id="loginBtn">Login</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#features" class="mobile-link">Features</a>
+            <a href="about.html" class="mobile-link">About</a>
+            <a href="contact.html" class="mobile-link">Contact</a>
+            <div id="mobileUserArea">
+                <button class="btn-login mobile" id="mobileLoginBtn">Login</button>
             </div>
         </div>
+
+    <!-- Google Login Modal -->
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-overlay hidden">
+        <div class="login-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="login-header">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h2 class="modal-title">Welcome Back</h2>
+                <p class="modal-subtitle">Login to manage your premium links</p>
+            </div>
+            <button class="btn-google-login" id="googleLoginBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+            <p class="modal-footer-text">By continuing, you agree to our <a href="terms.html">Terms</a> and <a href="cookies.html">Privacy</a>.</p>
+        </div>
+    </div>
+
     </nav>
 
+    <!-- Main Content -->
     <main>
-        <section class="hero-section" style="padding-top: 60px;">
+        <!-- Hero Section -->
+        <section class="hero-section">
             <div class="container">
                 <div class="badge">
-                    <svg style="width: 14px; height: 14px;" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    <svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span>ACCOUNT SETTINGS</span>
+                    <span>TRUSTED BY PROFESSIONALS</span>
                 </div>
-                <h1 class="hero-title">Your <span class="text-blue">Profile</span></h1>
+
+                <h1 class="hero-title">
+                    Shorten your links.<br>
+                    <span class="text-blue">Instantly.</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Create simple, clean, and permanent short links with no sign-up.<br>
+                    Professional link management made effortless.
+                </p>
             </div>
         </section>
 
-        <section class="dashboard-section" style="margin-top: -40px; padding-bottom: 80px;">
+        <!-- URL Input Section -->
+        <section class="input-section">
             <div class="container-small">
-                <div class="dashboard-card" style="padding: 0; overflow: hidden; border-radius: 24px;">
-                    <!-- Profile Header -->
-                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 60px 40px; text-align: center; color: white;">
-                        <div style="position: relative; display: inline-block;">
-                            <div id="profileInitial" style="width: 110px; height: 110px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 4px solid rgba(255, 255, 255, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 800; margin: 0 auto 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                                K
-                            </div>
-                        </div>
-                        <h2 id="displayNameHeading" style="font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px;">Krushna Anil Kaminwar</h2>
-                        <p style="opacity: 0.9; font-size: 16px; font-weight: 500;">Member since 2024</p>
+                <div class="input-wrapper">
+                    <div class="input-group">
+                        <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="urlInput" 
+                            class="url-input" 
+                            placeholder="Paste your long URL here..."
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button id="shortenBtn" class="btn-shorten">
+                            <span class="btn-text">Shorten Link</span>
+                            <svg class="btn-arrow" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="btn-loader hidden">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </span>
+                        </button>
                     </div>
 
-                    <!-- Profile Form -->
-                    <div style="padding: 40px;">
-                        <div style="display: grid; gap: 24px; margin-bottom: 40px;">
-                            <!-- Full Name Field -->
-                            <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; transition: all 0.3s ease;">
-                                <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Full Name</label>
-                                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                                    <input type="text" id="userNameInput" value="Krushna Anil Kaminwar" 
-                                        style="flex: 1; min-width: 200px; font-size: 18px; color: #0f172a; font-weight: 600; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px 16px; outline: none; transition: all 0.2s ease;" 
-                                        readonly spellcheck="false">
-                                    <button id="editNameBtn" class="btn-primary" style="padding: 12px 24px; font-size: 14px; white-space: nowrap;">Edit Profile</button>
-                                </div>
-                                <p style="font-size: 13px; color: #94a3b8; margin-top: 10px;">This name will be displayed across your shortened links and dashboard.</p>
-                            </div>
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="error-message hidden">
+                        <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span id="errorText">Please enter a valid URL</span>
+                    </div>
+                </div>
 
-                            <!-- Email Field -->
-                            <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;">
-                                <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Login Email</label>
-                                <div style="display: flex; align-items: center; gap: 12px; color: #0f172a;">
-                                    <svg style="width: 20px; height: 20px; color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    <span style="font-size: 18px; font-weight: 600; word-break: break-all;">krishnakaminwar021@gmail.com</span>
-                                </div>
-                                <p style="font-size: 13px; color: #94a3b8; margin-top: 10px;">Your primary email address linked to your Google Account.</p>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                            <a href="index.html" class="btn-login" style="text-decoration: none; padding: 14px 32px; display: flex; align-items: center; gap: 8px;">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <!-- Result Card -->
+                <div id="resultCard" class="result-card hidden">
+                    <div class="result-left">
+                        <div class="success-badge">SUCCESS</div>
+                        <div class="short-link" id="shortLinkDisplay">linkmaker.in/xyz123</div>
+                        <p class="result-subtitle">Your premium short link is ready!</p>
+                        
+                        <div class="result-actions">
+                            <button id="copyBtn" class="btn-copy">
+                                <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
                                 </svg>
-                                Back to Dashboard
-                            </a>
-                            <button id="logoutBtnMain" class="btn-primary" style="background: #ef4444; border: none; padding: 14px 32px; display: flex; align-items: center; gap: 8px;">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                <span class="copy-text">Copy Link</span>
+                            </button>
+                            <button class="btn-qr" id="qrBtn">
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clip-rule="evenodd"/>
+                                    <path d="M11 4a1 1 0 10-2 0v1a1 1 0 002 0V4zM10 7a1 1 0 011 1v1h2a1 1 0 110 2h-3a1 1 0 01-1-1V8a1 1 0 011-1zM16 9a1 1 0 100 2 1 1 0 000-2zM9 13a1 1 0 011-1h1a1 1 0 110 2v2a1 1 0 11-2 0v-3zM7 12a1 1 0 10-2 0v2a1 1 0 102 0v-2zM15 13a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z"/>
                                 </svg>
-                                Logout Account
                             </button>
                         </div>
+
+                        <!-- Copy Success Message -->
+                        <div id="copySuccess" class="copy-success hidden">
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Copied to clipboard!
+                        </div>
+
+                        <!-- Original URL -->
+                        <div class="original-url">
+                            <span class="original-label">ORIGINAL URL</span>
+                            <span id="originalUrlText" class="original-text"></span>
+                        </div>
+                    </div>
+
+                    <div class="result-right">
+                        <div class="qr-container">
+                            <div class="qr-code" id="qrCode">
+                                <!-- QR Code Pattern -->
+                                <svg viewBox="0 0 100 100" fill="none">
+                                    <rect width="100" height="100" fill="white"/>
+                                    <rect x="10" y="10" width="25" height="25" fill="black"/>
+                                    <rect x="65" y="10" width="25" height="25" fill="black"/>
+                                    <rect x="10" y="65" width="25" height="25" fill="black"/>
+                                    <rect x="15" y="15" width="15" height="15" fill="white"/>
+                                    <rect x="70" y="15" width="15" height="15" fill="white"/>
+                                    <rect x="15" y="70" width="15" height="15" fill="white"/>
+                                    <rect x="20" y="20" width="5" height="5" fill="black"/>
+                                    <rect x="75" y="20" width="5" height="5" fill="black"/>
+                                    <rect x="20" y="75" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="10" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="10" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="20" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="20" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="30" width="5" height="5" fill="black"/>
+                                    <rect x="10" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="20" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="30" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="65" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="75" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="85" y="45" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="55" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="55" width="5" height="5" fill="black"/>
+                                    <rect x="65" y="55" width="5" height="5" fill="black"/>
+                                    <rect x="85" y="55" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="65" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="65" width="5" height="5" fill="black"/>
+                                    <rect x="85" y="65" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="75" width="5" height="5" fill="black"/>
+                                    <rect x="65" y="75" width="5" height="5" fill="black"/>
+                                    <rect x="75" y="75" width="5" height="5" fill="black"/>
+                                    <rect x="45" y="85" width="5" height="5" fill="black"/>
+                                    <rect x="55" y="85" width="5" height="5" fill="black"/>
+                                    <rect x="65" y="85" width="5" height="5" fill="black"/>
+                                    <rect x="85" y="85" width="5" height="5" fill="black"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section class="dashboard-section">
+            <div class="container">
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <h2 class="dashboard-title">Your Dashboard</h2>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon links-icon">
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Links</div>
+                                <div class="stat-value" id="totalLinks">0</div>
+                                <div class="stat-change positive">
+                                    <svg viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span id="linkChange">+0 today</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon clicks-icon">
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Clicks</div>
+                                <div class="stat-value" id="totalClicks">0</div>
+                                <div class="stat-change neutral">
+                                    <svg viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>All time</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon active-icon">
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Active Links</div>
+                                <div class="stat-value" id="activeLinks">0</div>
+                                <div class="stat-change positive">
+                                    <svg viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>100% active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="links-table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Your Shortened Links</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="links-table" id="linksTable">
+                                <thead>
+                                    <tr>
+                                        <th>Original URL</th>
+                                        <th>Shortened Link</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linksTableBody">
+                                    <tr class="empty-state">
+                                        <td colspan="4">
+                                            <div class="empty-message">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                                </svg>
+                                                <p>No links shortened yet</p>
+                                                <span>Start by shortening your first link above</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why LinkMaker Section -->
+        <section class="features-section" id="features">
+            <div class="container">
+                <h2 class="section-title">Why LinkMaker?</h2>
+                <p class="section-subtitle">Professional link management with enterprise-grade features</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Lightning Fast</h3>
+                        <p class="feature-description">Generate short links in milliseconds. Our optimized infrastructure ensures instant results every time.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Privacy First</h3>
+                        <p class="feature-description">Your data is yours. We never track, sell, or share your information. Complete privacy guaranteed.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Deep Insights</h3>
+                        <p class="feature-description">Track clicks, analyze traffic, and understand your audience with powerful analytics dashboards.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to simplify your links?</h2>
+                    <p class="cta-subtitle">Join thousands of professionals who trust LinkMaker for their link management needs.</p>
+                    
+                    <div class="cta-buttons">
+                        <button class="btn-cta-primary" id="ctaShortenBtn">Get Started for Free</button>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <script>
-        const nameInput = document.getElementById('userNameInput');
-        const editBtn = document.getElementById('editNameBtn');
-        const profileInitial = document.getElementById('profileInitial');
-        const displayNameHeading = document.getElementById('displayNameHeading');
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text">LinkMaker</span>
+                    </div>
+                </div>
 
-        // Load saved name and update UI
-        function updateProfileUI() {
-            const savedName = localStorage.getItem('userDisplayName') || "Krushna Anil Kaminwar";
-            nameInput.value = savedName;
-            displayNameHeading.textContent = savedName;
-            profileInitial.textContent = savedName.charAt(0).toUpperCase();
-        }
+                <div class="footer-right">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="cookies.html" class="footer-link">Cookies</a>
+                    <a href="contact.html" class="footer-link">Contact Support</a>
+                </div>
+            </div>
 
-        updateProfileUI();
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 LinkMaker. Designed with care.</p>
+                
+                <div class="footer-social">
+                    <a href="https://www.linkedin.com/in/krushna-kaminwar-90b575340?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/s24kaminwarkrushna-beep?tab=repositories" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-        editBtn.addEventListener('click', () => {
-            if (nameInput.hasAttribute('readonly')) {
-                // Switch to edit mode
-                nameInput.removeAttribute('readonly');
-                nameInput.style.borderColor = '#3b82f6';
-                nameInput.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
-                nameInput.focus();
-                editBtn.textContent = 'Save Changes';
-                editBtn.style.background = '#16a34a'; // Green for save
-            } else {
-                // Save name
-                const newName = nameInput.value.trim();
-                if (newName) {
-                    localStorage.setItem('userDisplayName', newName);
-                    nameInput.setAttribute('readonly', true);
-                    nameInput.style.borderColor = '#cbd5e1';
-                    nameInput.style.boxShadow = 'none';
-                    editBtn.textContent = 'Edit Profile';
-                    editBtn.style.background = ''; // Reset to primary
-                    updateProfileUI();
-                } else {
-                    alert('Please enter a valid name.');
-                }
-            }
-        });
-
-        // Simple script to handle logout on this specific page
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            // We keep the name in storage so it's there when they log back in
-            window.location.href = 'index.html';
-        }
-        document.getElementById('logoutBtnTop').addEventListener('click', logout);
-        document.getElementById('logoutBtnMain').addEventListener('click', logout);
-
-        // Redirect if not logged in
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'index.html';
-        }
-    </script>
+    <script src="script.js"></script>
+    <!-- Cookie Consent Banner -->
+    <div id="cookieConsent" class="cookie-banner hidden">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <span class="cookie-emoji">🍪</span>
+                <p>We use cookies to enhance your experience and analyze traffic as described in our <a href="cookies.html">Cookie Policy</a>.</p>
+            </div>
+            <div class="cookie-actions">
+                <button id="rejectCookies" class="btn-cookie-secondary">Reject</button>
+                <button id="acceptCookies" class="btn-cookie-primary">Accept All</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
