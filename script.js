@@ -386,19 +386,30 @@ saveDashboardData();
 * Animates counter from start to end
 */
 function animateCounter(element, start, end) {
-const duration = 1000;
-const range = end - start;
-const increment = range / (duration / 16);
-let current = start;
+  // ✅ FIX: prevent infinite loop when values are same
+  if (start === end) {
+    element.textContent = end.toLocaleString();
+    return;
+  }
 
-const timer = setInterval(() => {
-current += increment;
-if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-current = end;
-clearInterval(timer);
-}
-element.textContent = Math.floor(current).toLocaleString();
-}, 16);
+  const duration = 1000;
+  const range = end - start;
+  const increment = range / (duration / 16);
+  let current = start;
+
+  const timer = setInterval(() => {
+    current += increment;
+
+    if (
+      (increment > 0 && current >= end) ||
+      (increment < 0 && current <= end)
+    ) {
+      current = end;
+      clearInterval(timer);
+    }
+
+    element.textContent = Math.floor(current).toLocaleString();
+  }, 16);
 }
 
 /**
