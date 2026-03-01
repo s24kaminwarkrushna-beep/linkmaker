@@ -1,17 +1,284 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <script>
-    // Save the short path (like /abc123)
-    sessionStorage.setItem(
-      "redirectPath",
-      window.location.pathname
-    );
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting... - LinkMaker</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    // Redirect ONLY once to index.html
-    window.location.replace("/index.html");
-  </script>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .redirect-container {
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .redirect-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 24px;
+        }
+
+        .logo-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        /* Loading State */
+        .loading-state h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .loading-state p {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            display: none;
+        }
+
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            background: #fef2f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .error-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #ef4444;
+        }
+
+        .error-state h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .error-state p {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .error-code-text {
+            font-size: 13px;
+            color: #94a3b8;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-home svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
 </head>
-<body></body>
+<body>
+    <div class="redirect-container">
+        <div class="redirect-card">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.5 3C11.0147 3 9 5.01472 9 7.5C9 7.88889 9.05263 8.26316 9.15789 8.61111L3.61111 14.1579C3.26316 14.0526 2.88889 14 2.5 14C1.11929 14 0 15.1193 0 16.5C0 17.8807 1.11929 19 2.5 19C3.88071 19 5 17.8807 5 16.5C5 16.1111 4.94737 15.7368 4.84211 15.3889L10.3889 9.84211C10.7368 9.94737 11.1111 10 11.5 10C11.8889 10 12.2632 9.94737 12.6111 9.84211L18.1579 15.3889C18.0526 15.7368 18 16.1111 18 16.5C18 17.8807 19.1193 19 20.5 19C21.8807 19 23 17.8807 23 16.5C23 15.1193 21.8807 14 20.5 14C20.1111 14 19.7368 14.0526 19.3889 14.1579L13.8421 8.61111C13.9474 8.26316 14 7.88889 14 7.5C14 5.01472 11.9853 3 9.5 3H13.5Z" fill="currentColor"/>
+                </svg>
+            </div>
+
+            <!-- Loading State (shown first) -->
+            <div class="loading-state" id="loadingState">
+                <h2>Redirecting...</h2>
+                <p>Please wait while we find your link</p>
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Error State (shown if link not found) -->
+            <div class="error-state" id="errorState">
+                <div class="error-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                </div>
+                <h2>Link Not Found</h2>
+                <p>This short link doesn't exist or may have been removed.</p>
+                <p class="error-code-text" id="errorCodeDisplay"></p>
+                <a href="https://linkmaker.in" class="btn-home">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Go to LinkMaker
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            updateDoc,
+            increment
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9hswCz4qUriPm5WR7_W2Y4N0g7D-pReI",
+            authDomain: "linkmaker-735e9.firebaseapp.com",
+            projectId: "linkmaker-735e9",
+            appId: "1:247697787542:web:9e7a352fcff462cd0b10b7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorCodeDisplay = document.getElementById('errorCodeDisplay');
+
+        function showError(shortCode) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'block';
+            if (shortCode) {
+                errorCodeDisplay.textContent = `Requested: linkmaker.in/${shortCode}`;
+            }
+        }
+
+        async function handleRedirect() {
+            const path = window.location.pathname;
+            const shortCode = path.replace(/^\/+/, '').replace(/\/+$/, '').trim();
+
+            // If no short code, go home
+            if (!shortCode) {
+                window.location.replace('https://linkmaker.in');
+                return;
+            }
+
+            // Skip known pages (shouldn't hit 404, but just in case)
+            const knownPages = [
+                'index.html', 'about.html', 'privacy.html',
+                'terms.html', 'cookies.html', 'contact.html',
+                'profile.html', '404.html'
+            ];
+
+            if (knownPages.includes(shortCode)) {
+                window.location.replace('https://linkmaker.in');
+                return;
+            }
+
+            console.log("🔍 404.html looking up short code:", shortCode);
+
+            try {
+                const linkRef = doc(db, "links", shortCode);
+                const snap = await getDoc(linkRef);
+
+                if (!snap.exists()) {
+                    console.log("❌ Short code not found:", shortCode);
+                    showError(shortCode);
+                    return;
+                }
+
+                const data = snap.data();
+
+                // Increment click count (fire and forget)
+                updateDoc(linkRef, {
+                    clicks: increment(1)
+                }).catch(err => console.warn("Click count update failed:", err));
+
+                console.log("✅ Redirecting to:", data.originalUrl);
+
+                // Redirect immediately
+                window.location.replace(data.originalUrl);
+
+            } catch (err) {
+                console.error("❌ Redirect failed:", err);
+                showError(shortCode);
+            }
+        }
+
+        // Run immediately
+        handleRedirect();
+    </script>
+</body>
 </html>
