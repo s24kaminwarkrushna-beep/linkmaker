@@ -830,54 +830,15 @@ setTimeout(() => banner.classList.add('hidden'), 500);
 });
 }
 
-async function firestoreRedirect() {
-  const path = window.location.pathname;
-  // ✅ FIX: Remove ALL leading slashes properly
-  const shortCode = path.replace(/^\/+/, '').trim();
-
-  // If homepage or empty, do nothing
-  if (!shortCode || shortCode === '' || shortCode === 'index.html' || shortCode === 'about.html' || shortCode === 'privacy.html' || shortCode === 'terms.html' || shortCode === 'cookies.html' || shortCode === 'contact.html' || shortCode === 'profile.html') {
-    console.log("📄 On a known page, skipping redirect check");
-    return;
-  }
-
-  console.log("🔍 Checking redirect for:", shortCode);
-
-  try {
-    const linkRef = doc(db, "links", shortCode);
-    const snap = await getDoc(linkRef);
-
-    if (!snap.exists()) {
-      console.log("❌ Short code not found in Firestore:", shortCode);
-      // Don't destroy the page on homepage
-      return;
-    }
-
-    const data = snap.data();
-
-    // 🔥 Increment click count
-    await updateDoc(linkRef, {
-      clicks: increment(1)
-    });
-
-    console.log("🔁 Redirecting to:", data.originalUrl);
-    // 🔁 Redirect
-    window.location.replace(data.originalUrl);
-
-  } catch (err) {
-    console.error("Redirect failed", err);
-  }
-}
+// ✅ REMOVED firestoreRedirect() — 404.html now handles all short link redirects
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', () => {
 init();
-firestoreRedirect();
 initCookieConsent();
 });
 } else {
 init();
-firestoreRedirect();
 initCookieConsent();
 }
