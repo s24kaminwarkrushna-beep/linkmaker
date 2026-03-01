@@ -302,13 +302,14 @@ function hideError() {
 errorMessage.classList.add('hidden');
 }
 
+// ✅ FIX: QR code now uses the ORIGINAL URL instead of short URL
 function showResult(shortCode, originalURL) {
   const shortURL = `https://linkmaker.in/${shortCode}`;
 
   shortLinkDisplay.textContent = shortURL;
   originalUrlText.textContent = originalURL;
 
-  generateQRCode(shortURL);
+  generateQRCode(originalURL); // ✅ QR points to ORIGINAL link
 
   resultCard.classList.remove('hidden');
 
@@ -647,10 +648,11 @@ qrContainer.innerHTML = `
    `;
 }
 
+// ✅ FIX: QR download also uses the ORIGINAL URL
 function handleQRClick() {
-const shortURL = shortLinkDisplay.textContent;
+const originalURL = originalUrlText.textContent;
 
-const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(shortURL)}&margin=10`;
+const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
 
 const link = document.createElement('a');
 link.href = qrApiUrl;
