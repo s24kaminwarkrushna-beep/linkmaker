@@ -1,3 +1,12 @@
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  increment,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 // ========================================
 // FIREBASE SETUP
 // ========================================
@@ -645,7 +654,12 @@ await new Promise(resolve => setTimeout(resolve, 1000));
 const shortCode = generateShortCode();
 
 // Store mapping
-urlDatabase.set(shortCode, normalizedURL);
+await setDoc(doc(db, "links", shortCode), {
+  originalUrl: normalizedURL,
+  uid: auth.currentUser.uid,
+  clicks: 0,
+  createdAt: serverTimestamp()
+});
 
 // Add to history table
 addLinkToHistory(shortCode, normalizedURL);
