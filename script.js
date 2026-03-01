@@ -38,29 +38,81 @@ prompt: "select_account"
 });
 
 console.log("🔥 Firebase connected successfully");
-// ========================================
-// LOGIN MODAL HANDLING  ✅ PASTE HERE
-// ========================================
-const loginBtn = document.getElementById("loginBtn");
-const mobileLoginBtn = document.getElementById("mobileLoginBtn");
-const loginModal = document.getElementById("loginModal");
-const closeModal = document.getElementById("closeModal");
 
-loginBtn?.addEventListener("click", () => {
-loginModal.classList.remove("hidden");
-});
-
-mobileLoginBtn?.addEventListener("click", () => {
-loginModal.classList.remove("hidden");
-});
-
-closeModal?.addEventListener("click", () => {
-loginModal.classList.add("hidden");
-});
 // ========================================
 // GLOBAL DATA
 // ========================================
 const linksHistory = [];
+
+// ========================================
+// DOM ELEMENTS (DECLARE EARLY)
+// ========================================
+const urlInput = document.getElementById('urlInput');
+const shortenBtn = document.getElementById('shortenBtn');
+const btnText = document.querySelector('.btn-text');
+const btnArrow = document.querySelector('.btn-arrow');
+const btnLoader = document.querySelector('.btn-loader');
+const errorMessage = document.getElementById('errorMessage');
+const errorText = document.getElementById('errorText');
+const resultCard = document.getElementById('resultCard');
+const shortLinkDisplay = document.getElementById('shortLinkDisplay');
+const originalUrlText = document.getElementById('originalUrlText');
+const copyBtn = document.getElementById('copyBtn');
+const copySuccess = document.getElementById('copySuccess');
+const qrBtn = document.getElementById('qrBtn');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+// Dashboard Elements
+const totalLinksEl = document.getElementById('totalLinks');
+const totalClicksEl = document.getElementById('totalClicks');
+const activeLinksEl = document.getElementById('activeLinks');
+const linkChangeEl = document.getElementById('linkChange');
+
+// ========================================
+// LOGIN MODAL HANDLING
+// ========================================
+function setupLoginModalListeners() {
+    const loginModal = document.getElementById("loginModal");
+    const closeModal = document.getElementById("closeModal");
+
+    const loginBtn = document.getElementById("loginBtn");
+    const mobileLoginBtn = document.getElementById("mobileLoginBtn");
+
+    loginBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("🔘 Login button clicked");
+        if (loginModal) {
+            loginModal.classList.remove("hidden");
+            console.log("✅ Modal shown");
+        }
+    });
+
+    mobileLoginBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("🔘 Mobile login button clicked");
+        if (loginModal) {
+            loginModal.classList.remove("hidden");
+        }
+    });
+
+    closeModal?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (loginModal) {
+            loginModal.classList.add("hidden");
+        }
+    });
+
+    // Close modal when clicking overlay background
+    loginModal?.addEventListener("click", (e) => {
+        if (e.target === loginModal) {
+            loginModal.classList.add("hidden");
+        }
+    });
+}
 
 // ========================================
 // GOOGLE LOGIN
@@ -96,8 +148,6 @@ if (loginModal) loginModal.classList.add("hidden");
 // Refresh UI
 updateUIForLogin();
 
-// Optional: Reload page to ensure everything syncs
-// window.location.reload();
 } catch (err) {
 console.error("❌ Login failed", err);
 alert("Google login failed. Please check your console for details.");
@@ -108,9 +158,6 @@ alert("Google login failed. Please check your console for details.");
 // AUTH STATE HANDLER (FIREBASE)
 // ========================================
 onAuthStateChanged(auth, (user) => {
-  const navUserArea = document.getElementById("navUserArea");
-  const mobileUserArea = document.getElementById("mobileUserArea");
-
 if (user) {
     // User is signed in
 localStorage.setItem("isLoggedIn", "true");
@@ -120,38 +167,26 @@ updateUIForLogin();
     // User is signed out
 localStorage.removeItem("isLoggedIn");
 localStorage.removeItem("userDisplayName");
-    // Also clear any UI specific to logged in state
+
     const navUserArea = document.getElementById("navUserArea");
     const mobileUserArea = document.getElementById("mobileUserArea");
-    if (navUserArea) navUserArea.innerHTML = '';
-    if (mobileUserArea) mobileUserArea.innerHTML = '';
 
     // 🔥 RESTORE LOGIN BUTTON (DESKTOP)
     if (navUserArea) {
       navUserArea.innerHTML = `
         <button class="btn-login" id="loginBtn">Login</button>
       `;
-
-      // reattach modal click
-      document
-        .getElementById("loginBtn")
-        ?.addEventListener("click", () => {
-          document.getElementById("loginModal")?.classList.remove("hidden");
-        });
     }
 
     // 🔥 RESTORE LOGIN BUTTON (MOBILE)
     if (mobileUserArea) {
       mobileUserArea.innerHTML = `
-        <button class="btn-login" id="mobileLoginBtn">Login</button>
+        <button class="btn-login mobile" id="mobileLoginBtn">Login</button>
       `;
-
-      document
-        .getElementById("mobileLoginBtn")
-        ?.addEventListener("click", () => {
-          document.getElementById("loginModal")?.classList.remove("hidden");
-        });
     }
+
+    // ✅ Re-attach login modal listeners after DOM update
+    setupLoginModalListeners();
 }
 });
 
@@ -202,31 +237,6 @@ mobileUserArea.innerHTML = `
 }
 }
 
-// ========================================
-// DOM ELEMENTS
-// ========================================
-const urlInput = document.getElementById('urlInput');
-const shortenBtn = document.getElementById('shortenBtn');
-const btnText = document.querySelector('.btn-text');
-const btnArrow = document.querySelector('.btn-arrow');
-const btnLoader = document.querySelector('.btn-loader');
-const errorMessage = document.getElementById('errorMessage');
-const errorText = document.getElementById('errorText');
-const resultCard = document.getElementById('resultCard');
-const shortLinkDisplay = document.getElementById('shortLinkDisplay');
-const originalUrlText = document.getElementById('originalUrlText');
-const copyBtn = document.getElementById('copyBtn');
-const copySuccess = document.getElementById('copySuccess');
-const qrBtn = document.getElementById('qrBtn');
-const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const mobileMenu = document.getElementById('mobileMenu');
-
-// Dashboard Elements
-const totalLinksEl = document.getElementById('totalLinks');
-const totalClicksEl = document.getElementById('totalClicks');
-const activeLinksEl = document.getElementById('activeLinks');
-const linkChangeEl = document.getElementById('linkChange');
-
 // Dashboard Data
 let dashboardData = {
 totalLinks: 0,
@@ -239,26 +249,17 @@ lastUpdate: new Date().toDateString()
 // UTILITY FUNCTIONS
 // ========================================
 
-/**
-* Validates if the provided string is a valid URL
-* @param {string} string - The URL string to validate
-* @returns {boolean} - True if valid URL, false otherwise
-*/
 function isValidURL(string) {
-// Remove leading/trailing whitespace
 string = string.trim();
 
-// Check if empty
 if (!string) {
 return false;
 }
 
-// Add protocol if missing
 if (!string.match(/^https?:\/\//i)) {
 string = 'http://' + string;
 }
 
-// URL validation pattern
 const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
 
 try {
@@ -269,11 +270,6 @@ return false;
 }
 }
 
-/**
-* Normalizes URL by ensuring it has a protocol
-* @param {string} url - The URL to normalize
-* @returns {string} - Normalized URL with protocol
-*/
 function normalizeURL(url) {
 url = url.trim();
 if (!url.match(/^https?:\/\//i)) {
@@ -282,11 +278,6 @@ return 'http://' + url;
 return url;
 }
 
-/**
-* Generates a random short code for the shortened URL
-* @param {number} length - Length of the short code
-* @returns {string} - Random alphanumeric code
-*/
 function generateShortCode(length = 6) {
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 let result = '';
@@ -298,39 +289,26 @@ result += characters.charAt(Math.floor(Math.random() * characters.length));
 return result;
 }
 
-/**
-* Shows error message with custom text
-* @param {string} message - Error message to display
-*/
 function showError(message) {
 errorText.textContent = message;
 errorMessage.classList.remove('hidden');
 
-// Auto-hide after 4 seconds
 setTimeout(() => {
 hideError();
 }, 4000);
 }
 
-/**
-* Hides error message
-*/
 function hideError() {
 errorMessage.classList.add('hidden');
 }
 
-/**
-* Shows the result card with the shortened link
-* @param {string} shortCode - The generated short code
-* @param {string} originalURL - The original long URL
-*/
 function showResult(shortCode, originalURL) {
   const shortURL = `https://linkmaker.in/${shortCode}`;
 
   shortLinkDisplay.textContent = shortURL;
   originalUrlText.textContent = originalURL;
 
-  generateQRCode(shortURL); // QR should point to SHORT link
+  generateQRCode(shortURL);
 
   resultCard.classList.remove('hidden');
 
@@ -338,47 +316,33 @@ function showResult(shortCode, originalURL) {
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 100);
 }
-/**
-* Hides the result card
-*/
+
 function hideResult() {
 resultCard.classList.add('hidden');
 copySuccess.classList.add('hidden');
 }
 
-/**
-* Updates the dashboard statistics
-*/
 function updateDashboard() {
-// Update total links
 dashboardData.totalLinks = linksHistory.length;
 
-// Check if it's a new day
 const today = new Date().toDateString();
 if (dashboardData.lastUpdate !== today) {
 dashboardData.todayLinks = 0;
 dashboardData.lastUpdate = today;
 }
 
-// Calculate actual total clicks from links history
 dashboardData.totalClicks = linksHistory.reduce((sum, link) => sum + (link.clicks || 0), 0);
 
-// Update DOM
 animateCounter(totalLinksEl, parseInt(totalLinksEl.textContent) || 0, dashboardData.totalLinks);
 animateCounter(totalClicksEl, parseInt(totalClicksEl.textContent) || 0, dashboardData.totalClicks);
 animateCounter(activeLinksEl, parseInt(activeLinksEl.textContent) || 0, dashboardData.totalLinks);
 
 linkChangeEl.textContent = `+${dashboardData.todayLinks} today`;
 
-// Save to localStorage
 saveDashboardData();
 }
 
-/**
-* Animates counter from start to end
-*/
 function animateCounter(element, start, end) {
-  // ✅ FIX: prevent infinite loop when values are same
   if (start === end) {
     element.textContent = end.toLocaleString();
     return;
@@ -386,15 +350,15 @@ function animateCounter(element, start, end) {
 
   const duration = 1000;
   const range = end - start;
-  const increment = range / (duration / 16);
+  const inc = range / (duration / 16);
   let current = start;
 
   const timer = setInterval(() => {
-    current += increment;
+    current += inc;
 
     if (
-      (increment > 0 && current >= end) ||
-      (increment < 0 && current <= end)
+      (inc > 0 && current >= end) ||
+      (inc < 0 && current <= end)
     ) {
       current = end;
       clearInterval(timer);
@@ -404,9 +368,6 @@ function animateCounter(element, start, end) {
   }, 16);
 }
 
-/**
-* Save dashboard data to localStorage
-*/
 function saveDashboardData() {
 try {
 localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
@@ -415,16 +376,12 @@ console.log('Could not save dashboard data');
 }
 }
 
-/**
-* Load dashboard data from localStorage
-*/
 function loadDashboardData() {
 try {
 const saved = localStorage.getItem('dashboardData');
 if (saved) {
 dashboardData = JSON.parse(saved);
 
-// Check if it's a new day
 const today = new Date().toDateString();
 if (dashboardData.lastUpdate !== today) {
 dashboardData.todayLinks = 0;
@@ -436,9 +393,6 @@ console.log('Could not load dashboard data');
 }
 }
 
-/**
-* Formats a date to a readable string
-*/
 function formatDate(date) {
 const now = new Date();
 const linkDate = new Date(date);
@@ -464,9 +418,6 @@ return linkDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', ye
 }
 }
 
-/**
-* Renders the links table
-*/
 function renderLinksTable() {
 const tableBody = document.getElementById('linksTableBody');
 
@@ -487,7 +438,6 @@ tableBody.innerHTML = `
 return;
 }
 
-// Sort by date (newest first)
 const sortedLinks = [...linksHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
 tableBody.innerHTML = sortedLinks.map((link, index) => `
@@ -508,7 +458,6 @@ tableBody.innerHTML = sortedLinks.map((link, index) => `
        </tr>
    `).join('');
 
-// Add event listeners to copy buttons
 tableBody.querySelectorAll('.btn-table-copy').forEach(btn => {
 btn.addEventListener('click', async (e) => {
 const url = e.target.getAttribute('data-url');
@@ -526,7 +475,6 @@ console.error('Copy failed', err);
 });
 });
 
-// Add event listeners to delete buttons
 tableBody.querySelectorAll('.btn-table-delete').forEach(btn => {
 btn.addEventListener('click', (e) => {
 const shortCode = e.target.getAttribute('data-code');
@@ -535,9 +483,6 @@ deleteLink(shortCode);
 });
 }
 
-/**
-* Adds a new link to the history
-*/
 function addLinkToHistory(shortCode, originalUrl) {
 const linkData = {
 shortCode: shortCode,
@@ -551,9 +496,6 @@ saveLinksHistory();
 renderLinksTable();
 }
 
-/**
-* Deletes a link from history
-*/
 function deleteLink(shortCode) {
 const index = linksHistory.findIndex(link => link.shortCode === shortCode);
 if (index > -1) {
@@ -564,9 +506,6 @@ updateDashboard();
 }
 }
 
-/**
-* Save links history to localStorage
-*/
 function saveLinksHistory() {
 try {
 localStorage.setItem('linksHistory', JSON.stringify(linksHistory));
@@ -575,9 +514,6 @@ console.log('Could not save links history');
 }
 }
 
-/**
-* Load links history from localStorage
-*/
 function loadLinksHistory() {
 try {
 const saved = localStorage.getItem('linksHistory');
@@ -594,16 +530,11 @@ console.log('Could not load links history');
 // EVENT HANDLERS
 // ========================================
 
-/**
-* Handles the URL shortening process
-*/
 async function handleShortenURL() {
 const url = urlInput.value.trim();
 
-// Hide any previous errors and results
 hideError();
 
-// Validate URL
 if (!url) {
 showError('Please enter a URL');
 return;
@@ -614,7 +545,6 @@ showError('Please enter a valid URL (e.g., https://example.com)');
 return;
 }
 
-// Normalize URL
 const normalizedURL = normalizeURL(url);
 
 // Show loading state
@@ -623,57 +553,59 @@ btnText.classList.add('hidden');
 btnArrow.classList.add('hidden');
 btnLoader.classList.remove('hidden');
 
-// Simulate processing delay for better UX
-await new Promise(resolve => setTimeout(resolve, 1000));
+try {
+  // Simulate processing delay for better UX
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-// Generate short code
-const shortCode = generateShortCode();
+  // Generate short code
+  const shortCode = generateShortCode();
 
-// 🔥 SAVE TO FIRESTORE (GLOBAL STORAGE)
-await setDoc(doc(db, "links", shortCode), {
-  originalUrl: normalizedURL,
-  createdAt: serverTimestamp(),
-  clicks: 0,
-  uid: auth.currentUser ? auth.currentUser.uid : null
-});
+  // 🔥 SAVE TO FIRESTORE (GLOBAL STORAGE)
+  await setDoc(doc(db, "links", shortCode), {
+    originalUrl: normalizedURL,
+    createdAt: serverTimestamp(),
+    clicks: 0,
+    uid: auth.currentUser ? auth.currentUser.uid : null
+  });
 
-// (optional UI-only history, not for redirect logic)
-addLinkToHistory(shortCode, normalizedURL);
+  console.log("✅ Link saved to Firestore:", shortCode);
 
-// Update dashboard
-dashboardData.todayLinks++;
-updateDashboard();
+  // UI-only history
+  addLinkToHistory(shortCode, normalizedURL);
 
-// Show result
-showResult(shortCode, normalizedURL);
+  // Update dashboard
+  dashboardData.todayLinks++;
+  updateDashboard();
 
-// Reset button state
-shortenBtn.disabled = false;
-btnText.classList.remove('hidden');
-btnArrow.classList.remove('hidden');
-btnLoader.classList.add('hidden');
+  // Show result
+  showResult(shortCode, normalizedURL);
 
-// Clear input
-urlInput.value = '';
+  // Clear input
+  urlInput.value = '';
+
+} catch (err) {
+  console.error("❌ Failed to shorten URL:", err);
+  showError('Failed to create short link. Please try again.');
+} finally {
+  // ✅ ALWAYS reset button state
+  shortenBtn.disabled = false;
+  btnText.classList.remove('hidden');
+  btnArrow.classList.remove('hidden');
+  btnLoader.classList.add('hidden');
+}
 }
 
-/**
-* Handles copying the shortened link to clipboard
-*/
 async function handleCopyLink() {
 const shortURL = shortLinkDisplay.textContent;
 
 try {
-// Use Clipboard API
 await navigator.clipboard.writeText(shortURL);
 
-// Show success feedback
 copyBtn.classList.add('copied');
 const originalText = copyBtn.querySelector('.copy-text').textContent;
 copyBtn.querySelector('.copy-text').textContent = 'Copied!';
 copySuccess.classList.remove('hidden');
 
-// Reset after 2 seconds
 setTimeout(() => {
 copyBtn.classList.remove('copied');
 copyBtn.querySelector('.copy-text').textContent = originalText;
@@ -681,7 +613,6 @@ copySuccess.classList.add('hidden');
 }, 2000);
 
 } catch (err) {
-// Fallback for older browsers
 const textArea = document.createElement('textarea');
 textArea.value = shortURL;
 textArea.style.position = 'fixed';
@@ -706,14 +637,9 @@ document.body.removeChild(textArea);
 }
 }
 
-/**
-* Generates a QR code for the shortened link
-* @param {string} text - The text to encode in the QR code
-*/
 function generateQRCode(text) {
 const qrContainer = document.getElementById('qrCode');
 
-// Uses the original long URL for the QR code for instant cross-device scannability
 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}&margin=10`;
 
 qrContainer.innerHTML = `
@@ -721,16 +647,11 @@ qrContainer.innerHTML = `
    `;
 }
 
-/**
-* Handles QR code button click - downloads the QR code
-*/
 function handleQRClick() {
-// Use the short URL for consistent redirect & analytics tracking
 const shortURL = shortLinkDisplay.textContent;
 
 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(shortURL)}&margin=10`;
 
-// Create a temporary link and trigger download
 const link = document.createElement('a');
 link.href = qrApiUrl;
 link.download = `qr-code-original.png`;
@@ -739,13 +660,9 @@ link.click();
 document.body.removeChild(link);
 }
 
-/**
-* Toggles mobile menu
-*/
 function toggleMobileMenu() {
 mobileMenu.classList.toggle('active');
 
-// Animate hamburger menu
 const spans = mobileMenuToggle.querySelectorAll('span');
 if (mobileMenu.classList.contains('active')) {
 spans[0].style.transform = 'rotate(45deg) translateY(8px)';
@@ -759,33 +676,14 @@ spans[2].style.transform = 'none';
 }
 
 // ========================================
-// REDIRECT SIMULATION
-// ========================================
-
-/**
-* Simulates link redirection
-* @param {string} shortCode - The short code to redirect
-*/  
-
-/**
-* Checks if the current URL contains a short code and simulates redirect
-* Optimized for /#/abc123 format
-*/
-
-
-// ========================================
 // SMOOTH SCROLLING FOR NAVIGATION
 // ========================================
 
-/**
-* Handles smooth scrolling for navigation links
-*/
 function handleNavigation() {
 document.querySelectorAll('a').forEach(anchor => {
 anchor.addEventListener('click', function (e) {
 const href = this.getAttribute('href');
 
-// If it's an internal hash link on the same page
 if (href && href.startsWith('#')) {
 const target = document.querySelector(href);
 if (target) {
@@ -796,12 +694,10 @@ block: 'start'
 });
 }
 
-// Close mobile menu if open
 if (mobileMenu.classList.contains('active')) {
 toggleMobileMenu();
 }
 }
-// External links or separate pages (like about.html) will behave normally
 });
 });
 }
@@ -810,31 +706,24 @@ toggleMobileMenu();
 // EVENT LISTENERS
 // ========================================
 
-// Shorten button click
 shortenBtn.addEventListener('click', handleShortenURL);
 
-// Enter key in input field
 urlInput.addEventListener('keypress', (e) => {
 if (e.key === 'Enter') {
 handleShortenURL();
 }
 });
 
-// Input field focus - hide error
 urlInput.addEventListener('focus', () => {
 hideError();
 });
 
-// Copy button click
 copyBtn.addEventListener('click', handleCopyLink);
 
-// QR button click
 qrBtn.addEventListener('click', handleQRClick);
 
-// Mobile menu toggle
 mobileMenuToggle.addEventListener('click', toggleMobileMenu);
 
-// Get Started CTA scroll
 const ctaShortenBtn = document.getElementById('ctaShortenBtn');
 if (ctaShortenBtn) {
 ctaShortenBtn.addEventListener('click', () => {
@@ -846,7 +735,6 @@ urlInput.focus();
 });
 }
 
-// Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
 if (mobileMenu.classList.contains('active') && 
 !mobileMenu.contains(e.target) && 
@@ -859,9 +747,6 @@ toggleMobileMenu();
 // SCROLL ANIMATIONS
 // ========================================
 
-/**
-* Adds scroll-triggered animations
-*/
 function initScrollAnimations() {
 const observerOptions = {
 threshold: 0.1,
@@ -877,7 +762,6 @@ entry.target.style.transform = 'translateY(0)';
 });
 }, observerOptions);
 
-// Observe feature cards
 document.querySelectorAll('.feature-card').forEach(card => {
 card.style.opacity = '0';
 card.style.transform = 'translateY(30px)';
@@ -890,28 +774,18 @@ observer.observe(card);
 // INITIALIZATION
 // ========================================
 
-/**
-* Initialize the application
-*/
 function init() {
-// Load saved data from localStorage
-
 loadDashboardData();
 loadLinksHistory();
 
-// Setup navigation
+// ✅ Setup login modal listeners on init
+setupLoginModalListeners();
+
 handleNavigation();
-
-// Initialize scroll animations
 initScrollAnimations();
-
-// Render links table
 renderLinksTable();
-
-// Update dashboard with current data
 updateDashboard();
 
-// Focus on input field
 urlInput.focus();
 
 console.log('LinkMaker initialized successfully!');
@@ -921,7 +795,6 @@ console.log('LinkMaker initialized successfully!');
 // START APPLICATION
 // ========================================
 
-// Cookie Consent Logic
 function initCookieConsent() {
 const banner = document.getElementById('cookieConsent');
 const acceptBtn = document.getElementById('acceptCookies');
@@ -941,7 +814,6 @@ banner.style.transition = 'all 0.5s ease';
 setTimeout(() => banner.classList.add('hidden'), 500);
 });
 
-// If user is already logged in, consider cookies accepted and hide banner
 if (localStorage.getItem('isLoggedIn') === 'true') {
 localStorage.setItem('cookieChoice', 'accepted');
 banner.classList.add('hidden');
@@ -955,22 +827,27 @@ banner.style.transition = 'all 0.5s ease';
 setTimeout(() => banner.classList.add('hidden'), 500);
 });
 }
+
 async function firestoreRedirect() {
   const path = window.location.pathname;
-  const shortCode = path.replace("/", "").trim();
+  // ✅ FIX: Remove ALL leading slashes properly
+  const shortCode = path.replace(/^\/+/, '').trim();
 
-  // If homepage, do nothing
-  if (!shortCode) return;
+  // If homepage or empty, do nothing
+  if (!shortCode || shortCode === '' || shortCode === 'index.html' || shortCode === 'about.html' || shortCode === 'privacy.html' || shortCode === 'terms.html' || shortCode === 'cookies.html' || shortCode === 'contact.html' || shortCode === 'profile.html') {
+    console.log("📄 On a known page, skipping redirect check");
+    return;
+  }
+
+  console.log("🔍 Checking redirect for:", shortCode);
 
   try {
     const linkRef = doc(db, "links", shortCode);
     const snap = await getDoc(linkRef);
 
     if (!snap.exists()) {
-      document.body.innerHTML = `
-        <h2>Link not found</h2>
-        <p>This short link does not exist.</p>
-      `;
+      console.log("❌ Short code not found in Firestore:", shortCode);
+      // Don't destroy the page on homepage
       return;
     }
 
@@ -981,12 +858,12 @@ async function firestoreRedirect() {
       clicks: increment(1)
     });
 
+    console.log("🔁 Redirecting to:", data.originalUrl);
     // 🔁 Redirect
     window.location.replace(data.originalUrl);
 
   } catch (err) {
     console.error("Redirect failed", err);
-    document.body.innerHTML = "<h2>Something went wrong</h2>";
   }
 }
 
@@ -1002,19 +879,3 @@ init();
 firestoreRedirect();
 initCookieConsent();
 }
-
-// ========================================
-// DEMO FUNCTIONALITY
-// ========================================
-
-/**
-* Add some demo data for testing (optional)
-* Uncomment to pre-populate with sample links
-*/
-function addDemoData() {
-// Example usage:
-// No longer uses urlDatabase
-}
-
-// Uncomment to add demo data
-// addDemoData();
