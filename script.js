@@ -60,7 +60,6 @@ loginModal.classList.add("hidden");
 // ========================================
 // GLOBAL DATA
 // ========================================
-// const urlDatabase = new Map();
 const linksHistory = [];
 
 // ========================================
@@ -296,11 +295,6 @@ for (let i = 0; i < length; i++) {
 result += characters.charAt(Math.floor(Math.random() * characters.length));
 }
 
-// Check if code already exists, regenerate if it does
-if (urlDatabase.has(result)) {
-return generateShortCode(length);
-}
-
 return result;
 }
 
@@ -336,22 +330,14 @@ function showResult(shortCode, originalURL) {
   shortLinkDisplay.textContent = shortURL;
   originalUrlText.textContent = originalURL;
 
-  generateQRCode(shortURL); // 🔥 QR should point to SHORT link
+  generateQRCode(shortURL); // QR should point to SHORT link
+
   resultCard.classList.remove('hidden');
+
+  setTimeout(() => {
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
 }
-
-// Generate QR code for the ORIGINAL long URL
-generateQRCode(originalURL);
-
-// Show result card with animation
-resultCard.classList.remove('hidden');
-
-// Scroll to result
-setTimeout(() => {
-resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}, 100);
-}
-
 /**
 * Hides the result card
 */
@@ -365,7 +351,7 @@ copySuccess.classList.add('hidden');
 */
 function updateDashboard() {
 // Update total links
-dashboardData.totalLinks = urlDatabase.size;
+dashboardData.totalLinks = linksHistory.length;
 
 // Check if it's a new day
 const today = new Date().toDateString();
@@ -507,11 +493,11 @@ const sortedLinks = [...linksHistory].sort((a, b) => new Date(b.createdAt) - new
 tableBody.innerHTML = sortedLinks.map((link, index) => `
        <tr data-index="${index}">
            <td class="original-url-cell" title="${link.originalUrl}">${link.originalUrl}</td>
-           <td class="short-url-cell">linkmaker.in/#/${link.shortCode}</td>
+           <td class="short-url-cell">linkmaker.in/${link.shortCode}</td>
            <td class="date-cell">${formatDate(link.createdAt)}</td>
            <td>
                <div class="actions-cell">
-                   <button class="btn-table-copy" data-url="https://linkmaker.in/#/${link.shortCode}">
+                   <button class="btn-table-copy" data-url="https://linkmaker.in/${link.shortCode}">
                        Copy
                    </button>
                    <button class="btn-table-delete" data-code="${link.shortCode}">
@@ -572,9 +558,7 @@ function deleteLink(shortCode) {
 const index = linksHistory.findIndex(link => link.shortCode === shortCode);
 if (index > -1) {
 linksHistory.splice(index, 1);
-urlDatabase.delete(shortCode);
 saveLinksHistory();
-saveToLocalStorage();
 renderLinksTable();
 updateDashboard();
 }
@@ -600,11 +584,6 @@ const saved = localStorage.getItem('linksHistory');
 if (saved) {
 const history = JSON.parse(saved);
 linksHistory.push(...history);
-
-// Restore urlDatabase from history
-history.forEach(link => {
-urlDatabase.set(link.shortCode, link.originalUrl);
-});
 }
 } catch (e) {
 console.log('Could not load links history');
@@ -655,14 +634,11 @@ await setDoc(doc(db, "links", shortCode), {
   originalUrl: normalizedURL,
   createdAt: serverTimestamp(),
   clicks: 0,
-  uid: auth.currentUser.uid
+  uid: auth.currentUser ? auth.currentUser.uid : null
 });
 
 // (optional UI-only history, not for redirect logic)
 addLinkToHistory(shortCode, normalizedURL);
-
-// Show result
-showResult(shortCode, normalizedURL);
 
 // Update dashboard
 dashboardData.todayLinks++;
@@ -685,7 +661,7 @@ urlInput.value = '';
 * Handles copying the shortened link to clipboard
 */
 async function handleCopyLink() {
-const shortURL = 'https://' + shortLinkDisplay.textContent;
+const shortURL = shortLinkDisplay.textContent;
 
 try {
 // Use Clipboard API
@@ -749,11 +725,10 @@ qrContainer.innerHTML = `
 * Handles QR code button click - downloads the QR code
 */
 function handleQRClick() {
-// Get the original URL from the display element
-const originalURL = originalUrlText.textContent;
+// Use the short URL for consistent redirect & analytics tracking
+const shortURL = shortLinkDisplay.textContent;
 
-// Use the original long URL for the download too
-const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
+const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(shortURL)}&margin=10`;
 
 // Create a temporary link and trigger download
 const link = document.createElement('a');
@@ -784,39 +759,6 @@ spans[2].style.transform = 'none';
 }
 
 // ========================================
-// LOCAL STORAGE FUNCTIONS
-// ========================================
-
-/**
-* Save data to localStorage for persistence
-*/
-function saveToLocalStorage() {
-try {
-localStorage.setItem('urlDatabase', JSON.stringify(Array.from(urlDatabase.entries())));
-} catch (e) {
-console.log('LocalStorage not available');
-}
-}
-
-/**
-* Load data from localStorage
-*/
-function loadFromLocalStorage() {
-try {
-const savedDatabase = localStorage.getItem('urlDatabase');
-
-if (savedDatabase) {
-const entries = JSON.parse(savedDatabase);
-entries.forEach(([key, value]) => {
-urlDatabase.set(key, value);
-});
-}
-} catch (e) {
-console.log('Could not load from localStorage');
-}
-}
-
-// ========================================
 // REDIRECT SIMULATION
 // ========================================
 
@@ -830,14 +772,6 @@ console.log('Could not load from localStorage');
 * Optimized for /#/abc123 format
 */
 
-
-// Legacy support for ?short=abc123
-const urlParams = new URLSearchParams(window.location.search);
-const legacyShortCode = urlParams.get('short');
-if (legacyShortCode && urlDatabase.has(legacyShortCode)) {
-handleRedirect(legacyShortCode);
-}
-}
 
 // ========================================
 // SMOOTH SCROLLING FOR NAVIGATION
@@ -977,9 +911,6 @@ renderLinksTable();
 // Update dashboard with current data
 updateDashboard();
 
-// Check for redirect parameters
-checkForRedirect();
-
 // Focus on input field
 urlInput.focus();
 
@@ -1068,6 +999,7 @@ initCookieConsent();
 });
 } else {
 init();
+firestoreRedirect();
 initCookieConsent();
 }
 
@@ -1081,9 +1013,7 @@ initCookieConsent();
 */
 function addDemoData() {
 // Example usage:
-// urlDatabase.set('demo1', 'https://www.example.com/very/long/url/path');
-// urlDatabase.set('demo2', 'https://github.com/user/repository');
-// saveToLocalStorage();
+// No longer uses urlDatabase
 }
 
 // Uncomment to add demo data
