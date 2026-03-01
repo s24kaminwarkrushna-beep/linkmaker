@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <script>
-    // Redirect unknown paths back to index.html
-    const path = window.location.pathname;
-    window.location.replace("/index.html" + path);
+    // Save the short path (like /abc123)
+    sessionStorage.setItem(
+      "redirectPath",
+      window.location.pathname
+    );
+
+    // Redirect ONLY once to index.html
+    window.location.replace("/index.html");
   </script>
 </head>
 <body></body>
