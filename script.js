@@ -60,7 +60,7 @@ loginModal.classList.add("hidden");
 // ========================================
 // GLOBAL DATA
 // ========================================
-const urlDatabase = new Map();
+// const urlDatabase = new Map();
 const linksHistory = [];
 
 // ========================================
@@ -331,11 +331,14 @@ errorMessage.classList.add('hidden');
 * @param {string} originalURL - The original long URL
 */
 function showResult(shortCode, originalURL) {
-const shortURL = `linkmaker.in/#/${shortCode}`;
-const fullShortURL = `https://${shortURL}`;
+  const shortURL = `https://linkmaker.in/${shortCode}`;
 
-shortLinkDisplay.textContent = shortURL;
-originalUrlText.textContent = originalURL;
+  shortLinkDisplay.textContent = shortURL;
+  originalUrlText.textContent = originalURL;
+
+  generateQRCode(shortURL); // 🔥 QR should point to SHORT link
+  resultCard.classList.remove('hidden');
+}
 
 // Generate QR code for the ORIGINAL long URL
 generateQRCode(originalURL);
@@ -820,40 +823,13 @@ console.log('Could not load from localStorage');
 /**
 * Simulates link redirection
 * @param {string} shortCode - The short code to redirect
-*/
-function handleRedirect(shortCode) {
-const originalURL = urlDatabase.get(shortCode);
-
-if (originalURL) {
-// Track the click in history
-const linkIndex = linksHistory.findIndex(l => l.shortCode === shortCode);
-if (linkIndex !== -1) {
-linksHistory[linkIndex].clicks = (linksHistory[linkIndex].clicks || 0) + 1;
-saveLinksHistory();
-updateDashboard();
-}
-
-// Direct redirection
-window.location.href = originalURL;
-} else {
-alert('Short link not found!');
-}
-}
+*/  
 
 /**
 * Checks if the current URL contains a short code and simulates redirect
 * Optimized for /#/abc123 format
 */
-function checkForRedirect() {
-// Check hash for short code (e.g., #/abc123)
-const hash = window.location.hash;
-if (hash && hash.startsWith('#/')) {
-const shortCode = hash.substring(2);
-if (urlDatabase.has(shortCode)) {
-handleRedirect(shortCode);
-return;
-}
-}
+
 
 // Legacy support for ?short=abc123
 const urlParams = new URLSearchParams(window.location.search);
@@ -985,7 +961,7 @@ observer.observe(card);
 */
 function init() {
 // Load saved data from localStorage
-loadFromLocalStorage();
+
 loadDashboardData();
 loadLinksHistory();
 
@@ -1048,11 +1024,46 @@ banner.style.transition = 'all 0.5s ease';
 setTimeout(() => banner.classList.add('hidden'), 500);
 });
 }
+async function firestoreRedirect() {
+  const path = window.location.pathname;
+  const shortCode = path.replace("/", "").trim();
+
+  // If homepage, do nothing
+  if (!shortCode) return;
+
+  try {
+    const linkRef = doc(db, "links", shortCode);
+    const snap = await getDoc(linkRef);
+
+    if (!snap.exists()) {
+      document.body.innerHTML = `
+        <h2>Link not found</h2>
+        <p>This short link does not exist.</p>
+      `;
+      return;
+    }
+
+    const data = snap.data();
+
+    // 🔥 Increment click count
+    await updateDoc(linkRef, {
+      clicks: increment(1)
+    });
+
+    // 🔁 Redirect
+    window.location.replace(data.originalUrl);
+
+  } catch (err) {
+    console.error("Redirect failed", err);
+    document.body.innerHTML = "<h2>Something went wrong</h2>";
+  }
+}
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', () => {
 init();
+firestoreRedirect();
 initCookieConsent();
 });
 } else {
