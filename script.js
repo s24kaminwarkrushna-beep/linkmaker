@@ -653,19 +653,19 @@ await new Promise(resolve => setTimeout(resolve, 1000));
 // Generate short code
 const shortCode = generateShortCode();
 
-// Store mapping
+// 🔥 SAVE TO FIRESTORE (GLOBAL STORAGE)
 await setDoc(doc(db, "links", shortCode), {
   originalUrl: normalizedURL,
-  uid: auth.currentUser.uid,
+  createdAt: serverTimestamp(),
   clicks: 0,
-  createdAt: serverTimestamp()
+  uid: auth.currentUser.uid
 });
 
-// Add to history table
+// (optional UI-only history, not for redirect logic)
 addLinkToHistory(shortCode, normalizedURL);
 
-// Save to localStorage for persistence
-saveToLocalStorage();
+// Show result
+showResult(shortCode, normalizedURL);
 
 // Update dashboard
 dashboardData.todayLinks++;
