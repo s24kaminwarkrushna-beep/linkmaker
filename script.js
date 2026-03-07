@@ -1,10 +1,4 @@
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -193,24 +187,11 @@ function updateUIForLogin() {
   const displayNavName = name.length > 12 ? name.substring(0, 10) + '...' : name;
 
   if (navUserArea) {
-    navUserArea.innerHTML = `
-      <div class="user-profile-nav" onclick="window.location.href='profile.html'">
-        <div class="user-avatar">${initial}</div>
-        <span class="user-name">${displayNavName}</span>
-      </div>
-    `;
+    navUserArea.innerHTML = `<div class="user-profile-nav" onclick="window.location.href='profile.html'"> <div class="user-avatar">${initial}</div> <span class="user-name">${displayNavName}</span> </div>`;
   }
 
   if (mobileUserArea) {
-    mobileUserArea.innerHTML = `
-      <div class="mobile-user-profile">
-        <div class="user-avatar">${initial}</div>
-        <div style="display: flex; flex-direction: column;">
-          <span class="user-name" onclick="window.location.href='profile.html'">${name}</span>
-          <a href="#" onclick="logoutUser()" style="margin-left: 0; margin-top: 4px;">Logout</a>
-        </div>
-      </div>
-    `;
+    mobileUserArea.innerHTML = `<div class="mobile-user-profile"> <div class="user-avatar">${initial}</div> <div style="display: flex; flex-direction: column;"> <span class="user-name" onclick="window.location.href='profile.html'">${name}</span> <a href="#" onclick="logoutUser()" style="margin-left: 0; margin-top: 4px;">Logout</a> </div> </div>`;
   }
 }
 
@@ -231,15 +212,29 @@ function isValidURL(string) {
   string = string.trim();
   if (!string) return false;
 
-  if (!string.match(/^https?:\/\//i)) {
-    string = 'http://' + string;
+  // Add protocol if missing
+  let testString = string;
+  if (!testString.match(/^https?:\/\//i)) {
+    testString = 'http://' + testString;
   }
 
-  const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
-
   try {
-    const url = new URL(string);
-    return urlPattern.test(string) && (url.protocol === 'http:' || url.protocol === 'https:');
+    const url = new URL(testString);
+    // Only allow http and https protocols
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return false;
+    }
+    // Must have a valid hostname with at least one dot
+    if (!url.hostname || !url.hostname.includes('.')) {
+      return false;
+    }
+    // Hostname must have valid TLD (at least 2 chars after last dot)
+    const parts = url.hostname.split('.');
+    const tld = parts[parts.length - 1];
+    if (tld.length < 2) {
+      return false;
+    }
+    return true;
   } catch (e) {
     return false;
   }
@@ -275,8 +270,17 @@ function hideError() {
 function showResult(shortCode, originalURL) {
   const shortURL = `https://linkmaker.in/${shortCode}`;
   shortLinkDisplay.textContent = shortURL;
-  originalUrlText.textContent = originalURL;
-  generateQRCode(originalURL);
+
+  // Truncate display of original URL if it's very long to prevent UI freeze
+  if (originalURL.length > 200) {
+    originalUrlText.textContent = originalURL.substring(0, 200) + '...';
+  } else {
+    originalUrlText.textContent = originalURL;
+  }
+  originalUrlText.title = originalURL;
+
+  // Generate QR code using the SHORT link (not the original long URL)
+  generateQRCode(`https://linkmaker.in/${shortCode}`);
   resultCard.classList.remove('hidden');
   setTimeout(() => {
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -375,64 +379,121 @@ function formatDate(date) {
   }
 }
 
+// Helper to safely escape HTML to prevent XSS and rendering issues with long URLs
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+// Helper to truncate a URL string for display
+function truncateURL(url, maxLen) {
+  if (url.length <= maxLen) return escapeHTML(url);
+  return escapeHTML(url.substring(0, maxLen)) + '...';
+}
+
 function renderLinksTable() {
   const tableBody = document.getElementById('linksTableBody');
 
   if (linksHistory.length === 0) {
-    tableBody.innerHTML = `
-      <tr class="empty-state">
-        <td colspan="4">
-          <div class="empty-message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-            </svg>
-            <p>No links shortened yet</p>
-            <span>Start by shortening your first link above</span>
-          </div>
-        </td>
-      </tr>
-    `;
+    tableBody.innerHTML = `<tr class="empty-state">
+            <td colspan="4">
+                <div class="empty-message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    <p>No links shortened yet</p>
+                    <span>Start by shortening your first link above</span>
+                </div>
+            </td>
+        </tr>`;
     return;
   }
 
   const sortedLinks = [...linksHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  tableBody.innerHTML = sortedLinks.map((link, index) => `
-    <tr data-index="${index}">
-      <td class="original-url-cell" title="${link.originalUrl}">${link.originalUrl}</td>
-      <td class="short-url-cell">linkmaker.in/${link.shortCode}</td>
-      <td class="date-cell">${formatDate(link.createdAt)}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn-table-copy" data-url="https://linkmaker.in/${link.shortCode}">Copy</button>
-          <button class="btn-table-delete" data-code="${link.shortCode}">Delete</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  // Build table rows using DOM methods to avoid innerHTML issues with very long URLs
+  tableBody.innerHTML = '';
 
-  tableBody.querySelectorAll('.btn-table-copy').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const url = e.target.getAttribute('data-url');
+  sortedLinks.forEach((link, index) => {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-index', index);
+
+    // Original URL cell
+    const tdOriginal = document.createElement('td');
+    tdOriginal.className = 'original-url-cell';
+    tdOriginal.title = link.originalUrl;
+    tdOriginal.textContent = link.originalUrl.length > 60
+      ? link.originalUrl.substring(0, 60) + '...'
+      : link.originalUrl;
+    tr.appendChild(tdOriginal);
+
+    // Short URL cell
+    const tdShort = document.createElement('td');
+    tdShort.className = 'short-url-cell';
+    tdShort.textContent = `linkmaker.in/${link.shortCode}`;
+    tr.appendChild(tdShort);
+
+    // Date cell
+    const tdDate = document.createElement('td');
+    tdDate.className = 'date-cell';
+    tdDate.textContent = formatDate(link.createdAt);
+    tr.appendChild(tdDate);
+
+    // Actions cell
+    const tdActions = document.createElement('td');
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'actions-cell';
+
+    const copyButton = document.createElement('button');
+    copyButton.className = 'btn-table-copy';
+    copyButton.textContent = 'Copy';
+    copyButton.addEventListener('click', async () => {
+      const url = `https://linkmaker.in/${link.shortCode}`;
       try {
         await navigator.clipboard.writeText(url);
-        e.target.textContent = 'Copied!';
-        e.target.classList.add('copied');
+        copyButton.textContent = 'Copied!';
+        copyButton.classList.add('copied');
         setTimeout(() => {
-          e.target.textContent = 'Copy';
-          e.target.classList.remove('copied');
+          copyButton.textContent = 'Copy';
+          copyButton.classList.remove('copied');
         }, 2000);
       } catch (err) {
-        console.error('Copy failed', err);
+        // Fallback copy
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          copyButton.textContent = 'Copied!';
+          copyButton.classList.add('copied');
+          setTimeout(() => {
+            copyButton.textContent = 'Copy';
+            copyButton.classList.remove('copied');
+          }, 2000);
+        } catch (e) {
+          console.error('Copy failed', e);
+        }
+        document.body.removeChild(textArea);
       }
     });
-  });
 
-  tableBody.querySelectorAll('.btn-table-delete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const shortCode = e.target.getAttribute('data-code');
-      deleteLink(shortCode);
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn-table-delete';
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', () => {
+      deleteLink(link.shortCode);
     });
+
+    actionsDiv.appendChild(copyButton);
+    actionsDiv.appendChild(deleteButton);
+    tdActions.appendChild(actionsDiv);
+    tr.appendChild(tdActions);
+
+    tableBody.appendChild(tr);
   });
 }
 
@@ -481,12 +542,23 @@ function loadLinksHistory() {
 // ========================================
 // EVENT HANDLERS
 // ========================================
+let isShortening = false;
+
 async function handleShortenURL() {
+  // Prevent double-clicks / multiple simultaneous requests
+  if (isShortening) return;
+
   const url = urlInput.value.trim();
   hideError();
 
   if (!url) {
     showError('Please enter a URL');
+    return;
+  }
+
+  // Check URL length limit (Firestore document field max ~1MB, but let's be practical)
+  if (url.length > 50000) {
+    showError('URL is too long. Maximum 50,000 characters allowed.');
     return;
   }
 
@@ -497,13 +569,15 @@ async function handleShortenURL() {
 
   const normalizedURL = normalizeURL(url);
 
+  isShortening = true;
   shortenBtn.disabled = true;
   btnText.classList.add('hidden');
   btnArrow.classList.add('hidden');
   btnLoader.classList.remove('hidden');
 
   try {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Small delay for UX feedback
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const shortCode = generateShortCode();
 
@@ -528,6 +602,7 @@ async function handleShortenURL() {
     console.error("❌ Failed to shorten URL:", err);
     showError('Failed to create short link. Please try again.');
   } finally {
+    isShortening = false;
     shortenBtn.disabled = false;
     btnText.classList.remove('hidden');
     btnArrow.classList.remove('hidden');
@@ -542,13 +617,13 @@ async function handleCopyLink() {
     await navigator.clipboard.writeText(shortURL);
 
     copyBtn.classList.add('copied');
-    const originalText = copyBtn.querySelector('.copy-text').textContent;
+    const originalTextContent = copyBtn.querySelector('.copy-text').textContent;
     copyBtn.querySelector('.copy-text').textContent = 'Copied!';
     copySuccess.classList.remove('hidden');
 
     setTimeout(() => {
       copyBtn.classList.remove('copied');
-      copyBtn.querySelector('.copy-text').textContent = originalText;
+      copyBtn.querySelector('.copy-text').textContent = originalTextContent;
       copySuccess.classList.add('hidden');
     }, 2000);
   } catch (err) {
@@ -578,19 +653,41 @@ async function handleCopyLink() {
 
 function generateQRCode(text) {
   const qrContainer = document.getElementById('qrCode');
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}&margin=10`;
-  qrContainer.innerHTML = `
-    <img src="${qrApiUrl}" alt="QR Code" style="width: 100%; height: 100%; border-radius: 8px;" />
-  `;
+
+  // Use the short URL for QR code generation (always short, never freezes)
+  // Limit QR text length just in case
+  let qrText = text;
+  if (qrText.length > 2000) {
+    qrText = qrText.substring(0, 2000);
+  }
+
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrText)}&margin=10`;
+
+  // Use DOM methods instead of innerHTML for safety
+  const img = document.createElement('img');
+  img.src = qrApiUrl;
+  img.alt = 'QR Code';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.borderRadius = '8px';
+
+  // Handle image load errors gracefully
+  img.onerror = () => {
+    qrContainer.innerHTML = '<p style="padding:20px;font-size:12px;color:#94a3b8;">QR code unavailable</p>';
+  };
+
+  qrContainer.innerHTML = '';
+  qrContainer.appendChild(img);
 }
 
 function handleQRClick() {
-  const originalURL = originalUrlText.textContent;
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(originalURL)}&margin=10`;
+  // Download QR for the SHORT link (not the original long URL)
+  const shortURL = shortLinkDisplay.textContent;
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(shortURL)}&margin=10`;
 
   const link = document.createElement('a');
   link.href = qrApiUrl;
-  link.download = `qr-code-original.png`;
+  link.download = `qr-code-linkmaker.png`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
